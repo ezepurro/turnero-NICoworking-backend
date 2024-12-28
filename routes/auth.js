@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 
-const { registerUser, loginUser } = require('../controllers/auth');
+const { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } = require('../controllers/auth');
 const { fieldValidator } = require('../middlewares/field-validator');
+const { JSWValidator } = require('../middlewares/jwt-validator');
+
 
 
 router.post('/register', 
@@ -24,5 +26,15 @@ router.post('/login',
     ], 
     loginUser
 );
+
+router.get('/users', getAllUsers);
+
+router.get('/users/:id', getUserById);
+
+router.put('/users/:id', updateUserById);
+
+router.delete('/users/:id', deleteUserById);
+
+router.get('/renew', JSWValidator, renewToken);
 
 module.exports = router;
