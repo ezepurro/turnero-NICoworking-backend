@@ -1,7 +1,7 @@
 const { response } = require('express');
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
 const { generateJWT } = require('../helpers/jwt');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -12,7 +12,6 @@ const registerUser = async ( req, res = response ) => {
     try {
         // Verifico si existe un usuario con el mismo email en la db
         const existingUser = await prisma.user.findUnique({ where: { email: email } });
-
         if ( existingUser ) {
             return res.status(400).json({
                 ok: false,
@@ -46,11 +45,45 @@ const registerUser = async ( req, res = response ) => {
     }
 }
 
-const loginUser = ( req, res = response ) => {
-    res.json({
-        ok: true,
-        msg: 'loginUser'
-    });
+const loginUser = async ( req, res = response ) => {
+
+    const { email, password } = req.body;
+
+    try {
+        // Verifico si existe un usuario con el mail registrado
+        const user = await prisma.user.findUnique({ where: { email: email } });
+        if ( !user ) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No se ha encontrado usuario con ese email registrado'
+            })
+        }
+
+        // Confirmo si coinciden las contraseñas
+        const validPassword = bcrypt.compareSync( password, user.password );
+        if ( !validPassword ) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Contraseña incorrecta'
+            })
+        }
+
+        // Genero el JWT
+        const token = await generateJWT( user.id, user.name );
+
+        res.json({
+            ok: true,
+            uid: user.id,
+            name: user.name,
+            token
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar el inicio de sesión'
+        });
+    }
 }
 
 const getAllUsers = async ( req, res = response ) => {
