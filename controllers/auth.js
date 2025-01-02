@@ -1,29 +1,41 @@
 const { response } = require('express');
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const { generateJWT } = require('../helpers/jwt');
 
 const prisma = new PrismaClient();
 
 const registerUser = async ( req, res = response ) => {
 
-    const { name, email, password } = req.body;
+    const { name, email, password, contact } = req.body;
 
     try {
         // Verifico si existe un usuario con el mismo email en la db
-        // Si no existe, instancio el modelo User creado
-        // user = new User( req.body );
+        const existingUser = await prisma.user.findUnique({ where: { email: email } });
+
+        if ( existingUser ) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Ya existe un usuario con ese email'
+            });
+        }
+
         // Encripto la contraseña
+        const salt = bcrypt.genSaltSync();
+        const encryptedPassword = bcrypt.hashSync( password, salt );
 
         // Y lo guardo en la db
-        // await prisma.user.create( req.body );
+        const user = await prisma.user.create({ data: { name, email, password: encryptedPassword, contact } });
 
         // Genero el JWT
-        // const token = await generateJWT( user.id, user.name );
+        const token = await generateJWT( user.id, user.name );
 
         // Retorno el estado y el token
         res.status(201).json({
             ok: true,
-        //    token
+            uid: user.id,
+            name: user.name,
+            token
         });
     } catch (error) {
         console.log(error);
