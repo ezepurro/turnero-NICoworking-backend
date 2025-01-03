@@ -1,7 +1,7 @@
 const { response } = require('express');
 const { PrismaClient } = require('@prisma/client');
-const { generateJWT } = require('../helpers/jwt');
 const bcrypt = require('bcryptjs');
+const { generateJWT } = require('../helpers/jwt');
 
 const prisma = new PrismaClient();
 
@@ -99,25 +99,72 @@ const getAllUsers = async ( req, res = response ) => {
     }
 }
 
-const getUserById = ( req, res = response ) => {
-    res.json({
-        ok: true,
-        msg: 'getUserById'
-    });
+const getUserById = async ( req, res = response ) => {
+    const userId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if ( !user ) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No se ha encontrado el usuario'
+            });
+        } 
+        res.status(200).json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se puede obtener el usuario de la db'
+        });
+    }
 }
 
-const updateUserById = ( req, res = response ) => {
-    res.json({
-        ok: true,
-        msg: 'updateUserById'
-    });
+const updateUserById = async ( req, res = response ) => {
+    const userId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if ( !user ) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No se ha encontrado el usuario'
+            });
+        } 
+        const updatedUser = await prisma.user.update({ where: { id: userId }, data: req.body });
+        res.status(200).json({
+            ok: true,
+            updatedUser
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido actualizar el usuario'
+        });
+    }
 }
 
-const deleteUserById = ( req, res = response ) => {
-    res.json({
-        ok: true,
-        msg: 'deleteUserById'
-    });
+const deleteUserById = async ( req, res = response ) => {
+    const userId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if ( !user ) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'No se ha encontrado el usuario'
+            });
+        } 
+        await prisma.user.delete({ where: { id: userId } });
+        res.status(200).json({
+            ok: true,
+            msg: 'Usuario eliminado'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido eliminar el usuario'
+        });
+    }
 }
 
 
