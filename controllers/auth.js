@@ -89,7 +89,10 @@ const loginUser = async ( req, res = response ) => {
 const getAllUsers = async ( req, res = response ) => {
     try {
         const users = await prisma.user.findMany();
-        res.json(users);
+        res.json({
+            ok: true,
+            users
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -109,7 +112,10 @@ const getUserById = async ( req, res = response ) => {
                 msg: 'No se ha encontrado el usuario'
             });
         } 
-        res.status(200).json(user);
+        res.status(200).json({
+            ok: true,
+            user
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({

@@ -16,15 +16,15 @@ model User {
   contact      String
   isAdmin      Boolean  @default(false)
   isCoworker   Boolean  @default(false)
-  appointments WaxAppointment[]
+  appointments Appointment[]
 }
 
-model WaxAppointment {
+model Appointment {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   client        User     @relation(fields: [clientId], references: [id])
   clientId      String   @db.ObjectId 
   date          DateTime  
   time          DateTime 
-  sessionLength Int 
-  sessionZones  Int
+  sessionLength Int? 
+  sessionZones  Int?
 }
