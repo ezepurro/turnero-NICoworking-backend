@@ -20,7 +20,7 @@ const getAppointments = async ( req, res = response ) => {
 }
 
 const createAppointment = async ( req, res = response ) => {
-    const { userId, date, time, sessionLength, sessionZones } = req.body;
+    const { userId, date, time, sessionLength, sessionZones, contact } = req.body;
     try {
         // Verifico que existe el usuario
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -38,7 +38,8 @@ const createAppointment = async ( req, res = response ) => {
                 date,
                 time,
                 sessionLength,
-                sessionZones
+                sessionZones,
+                contact
             }
         });
         res.json({
@@ -54,7 +55,32 @@ const createAppointment = async ( req, res = response ) => {
     }
 }
 
+const getUserAppointments = async ( req, res = response ) => {
+    const userId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado',
+            });
+        }
+        const appointments = await prisma.appointment.findMany({ where: { clientId: userId } });
+        res.json({
+            ok: true,
+            appointments
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+}
+
 module.exports = {
     getAppointments,
+    getUserAppointments,
     createAppointment
 }

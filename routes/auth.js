@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 
-const { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } = require('../controllers/auth');
 const { fieldValidator } = require('../middlewares/field-validator');
 const { JSWValidator } = require('../middlewares/jwt-validator');
+const { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } = require('../controllers/auth');
 
 
 
