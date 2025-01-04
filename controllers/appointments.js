@@ -79,8 +79,56 @@ const getUserAppointments = async ( req, res = response ) => {
     }
 }
 
+const updateAppointment = async ( req, res = response ) => {
+    const id = req.params.id;
+    const { userId, date, time, sessionLength, sessionZones, contact } = req.body;
+    try {
+        // Verifico que existe el usuario
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado',
+            });
+        }
+
+        // Verifico que existe la cita
+        const appointment = await prisma.appointment.findUnique({ where: { id } });
+        if (!appointment) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Cita no encontrada',
+            });
+        }
+
+        // Actualizo en la db
+        const updatedAppointment = await prisma.appointment.update({
+            where: { id },
+            data: {
+                clientId: userId,
+                date,
+                time,
+                sessionLength,
+                sessionZones,
+                contact
+            }
+        });
+        res.json({
+            ok: true,
+            updatedAppointment
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+}
+
 module.exports = {
     getAppointments,
     getUserAppointments,
-    createAppointment
+    createAppointment,
+    updateAppointment
 }
