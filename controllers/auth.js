@@ -105,7 +105,7 @@ const getAllUsers = async ( req, res = response ) => {
 const getUserById = async ( req, res = response ) => {
     const userId = req.params.id;
     try {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await prisma.user.findUnique({ where: { id: userId }, include: { appointments: true } });
         if ( !user ) {
             return res.status(404).json({
                 ok: false,

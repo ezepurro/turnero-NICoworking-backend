@@ -39,7 +39,10 @@ const createAppointment = async ( req, res = response ) => {
                 time,
                 sessionLength,
                 sessionZones,
-                contact
+                contact,
+                // client: {
+                //     connect: { id: userId }, // Conectar el appointment con el usuario existente
+                //   },
             }
         });
         res.json({
