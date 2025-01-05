@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const { fieldValidator } = require('../middlewares/field-validator');
-const { getAppointments, createAppointment, getUserAppointments, updateAppointment } = require('../controllers/appointments');
+const { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment } = require('../controllers/appointments');
 
 
 router.get('/', getAppointments);
@@ -21,6 +21,6 @@ router.post('/',
 
 router.put('/:id', updateAppointment);
 
-// router.delete('/:id', deleteAppointment);
+router.delete('/:id', deleteAppointment);
 
 module.exports = router;
