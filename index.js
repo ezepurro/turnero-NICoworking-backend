@@ -10,6 +10,7 @@ app.use(express.json());
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/appointments', require('./routes/appointments'));
+app.use('/api/settings', require('./routes/settings'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {

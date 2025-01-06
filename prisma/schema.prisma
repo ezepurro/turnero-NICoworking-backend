@@ -29,3 +29,8 @@ model Appointment {
   sessionZones  Int?
   contact       String
 }
+
+model CalendarSettings {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  waxDays DateTime[]
+}
