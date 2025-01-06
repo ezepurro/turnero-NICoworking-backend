@@ -1,5 +1,6 @@
 const { response } = require('express');
 const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,7 @@ const getCalendarSettings = async ( req, res = response ) => {
 
 const addDatesToCalendarSettings = async ( req, res = response ) => {
     const { newDates } = req.body;
-    const id = "677c215cbe4bd394ab3db8fe";
+    const id = process.env.CALENDARID;
     try {
         // Obtengo las configuraciones del calendario
         const calendar = await prisma.calendarSettings.findUnique({
