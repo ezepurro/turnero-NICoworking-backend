@@ -13,7 +13,6 @@ router.post('/',
     [
         check('contact', 'La información de contacto es obligatoria').not().isEmpty(),
         check('date', 'La fecha es obligatoria').not().isEmpty(),
-        check('time', 'La hora es obligatoria').not().isEmpty(),
         fieldValidator
     ], 
     createAppointment

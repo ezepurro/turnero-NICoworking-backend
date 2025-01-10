@@ -34,6 +34,7 @@ const registerUser = async ( req, res = response ) => {
             ok: true,
             uid: user.id,
             name: user.name,
+	    isAdmin: user.isAdmin,
             token
         });
     } catch (error) {
@@ -75,6 +76,7 @@ const loginUser = async ( req, res = response ) => {
             ok: true,
             uid: user.id,
             name: user.name,
+	    isAdmin: user.isAdmin,
             token
         });
     } catch (error) {

@@ -24,7 +24,6 @@ model Appointment {
   client        User     @relation(fields: [clientId], references: [id])
   clientId      String   @db.ObjectId 
   date          DateTime  
-  time          DateTime 
   sessionLength Int? 
   sessionZones  Int?
   contact       String
