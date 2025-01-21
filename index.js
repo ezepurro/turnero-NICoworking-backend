@@ -5,6 +5,9 @@ require('dotenv').config();
 // Crear el servidor de express
 const app = express();
 
+//PORT
+const Port = 3000|| process.env.PORT
+
 // Cors
 app.use(cors());
 
@@ -19,5 +22,5 @@ app.use('/api/settings', require('./routes/settings'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {
-    console.log(`Servidor corriendo en puerto ${process.env.PORT}`);
+    console.log(`Servidor corriendo en puerto ${Port}`);
 });
