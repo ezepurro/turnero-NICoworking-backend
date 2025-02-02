@@ -19,6 +19,8 @@ model User {
   appointments Appointment[]
 }
 
+
+
 model Appointment {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   client        User     @relation(fields: [clientId], references: [id])
