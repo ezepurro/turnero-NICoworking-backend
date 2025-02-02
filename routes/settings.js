@@ -4,6 +4,6 @@ const { getCalendarSettings, addDatesToCalendarSettings } = require('../controll
 
 router.get('/', getCalendarSettings);
 
-router.put('/', addDatesToCalendarSettings);
+router.put('/wax', addDatesToCalendarSettings);
 
 module.exports = router;

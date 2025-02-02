@@ -158,8 +158,25 @@ const deleteAppointment = async ( req, res = response ) => {
     }
 }
 
+const getWaxAppointments = async ( req, res = response ) => {
+    try {
+        const waxAppointments = await prisma.appointment.findMany({ where: { type: 'Depilación' } });
+        res.json({
+            ok: true,
+            waxAppointments
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+}
+
 module.exports = {
     getAppointments,
+    getWaxAppointments,
     getUserAppointments,
     createAppointment,
     updateAppointment,

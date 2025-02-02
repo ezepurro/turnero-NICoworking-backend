@@ -17,6 +17,7 @@ app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/settings', require('./routes/settings'));
 
 
+
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {
     console.log(`Servidor corriendo en puerto ${process.env.PORT}`);
