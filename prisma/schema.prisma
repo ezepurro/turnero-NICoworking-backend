@@ -29,6 +29,8 @@ model Appointment {
   client        User     @relation(fields: [clientId], references: [id])
   clientId      String   @db.ObjectId 
   date          DateTime  
+  horaInicio    DateTime 
+  horaFin    DateTime
   sessionLength Int? 
   sessionZones  Int?
   contact       String
@@ -39,3 +41,4 @@ model CalendarSettings {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   waxDays DateTime[]
 }
+
