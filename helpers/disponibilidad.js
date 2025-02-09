@@ -1,8 +1,9 @@
+const { response } = require('express');
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 
-export const obtenerDisponibilidad = async (req, res) => {
+export const obtenerDisponibilidad = async (req, res = response) => {
     const { fecha, duracion } = req.query; 
 
     const turnos = await prisma.turno.findMany({
