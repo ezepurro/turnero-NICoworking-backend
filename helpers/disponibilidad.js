@@ -1,11 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+const { response } = require('express');
+const { PrismaClient } = require('@prisma/client');
+
 const prisma = new PrismaClient();
 
 
-export const getEmptySpaces = async (req, res) => {
+export const obtenerDisponibilidad = async (req, res = response) => {
     const { fecha, duracion } = req.query; 
 
-    
+
     const turnos = await prisma.appointment.findMany({
     where: { date: new Date(fecha) },
     orderBy: { horaInicio: "asc" }
