@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 export const getEmptySpaces = async (req, res) => {
     const { fecha, duracion } = req.query; 
 
+    
     const turnos = await prisma.appointment.findMany({
     where: { date: new Date(fecha) },
     orderBy: { horaInicio: "asc" }
