@@ -2,11 +2,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 
-export const obtenerDisponibilidad = async (req, res) => {
+export const getEmptySpaces = async (req, res) => {
     const { fecha, duracion } = req.query; 
 
-    const turnos = await prisma.turno.findMany({
-    where: { fecha: new Date(fecha) },
+    const turnos = await prisma.appointment.findMany({
+    where: { date: new Date(fecha) },
     orderBy: { horaInicio: "asc" }
     });
 

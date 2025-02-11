@@ -3,9 +3,12 @@ const router = express.Router();
 const { check } = require('express-validator');
 const { fieldValidator } = require('../middlewares/field-validator');
 const { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments } = require('../controllers/appointments');
+const { getEmptySpaces } = require('../helpers/disponibilidad');
 
 
 router.get('/', getAppointments);
+
+router.get('/gaps', getEmptySpaces)
 
 router.get('/waxing', getWaxAppointments);
 
