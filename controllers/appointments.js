@@ -174,11 +174,44 @@ const getWaxAppointments = async ( req, res = response ) => {
     }
 }
 
+const getAppointmentsPagination = async (req, res = response) => {
+    try {
+        // ?page=1&limit=10
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10;  
+
+        const skip = (page - 1) * limit;  
+
+        const appointments = await prisma.appointment.findMany({
+            skip,
+            take: limit,
+        });
+
+        const totalAppointments = await prisma.appointment.count();
+
+        res.json({
+            ok: true,
+            appointments,
+            totalPages: Math.ceil(totalAppointments / limit),
+            currentPage: page,
+            totalAppointments
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+};
+
+
 module.exports = {
+    createAppointment,
+    deleteAppointment,
     getAppointments,
+    getAppointmentsPagination,
     getWaxAppointments,
     getUserAppointments,
-    createAppointment,
     updateAppointment,
-    deleteAppointment
 }

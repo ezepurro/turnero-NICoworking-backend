@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const { fieldValidator } = require('../middlewares/field-validator');
-const { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments } = require('../controllers/appointments');
+const { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination } = require('../controllers/appointments');
 
 
 router.get('/', getAppointments);
@@ -23,5 +23,7 @@ router.post('/',
 router.put('/:id', updateAppointment);
 
 router.delete('/:id', deleteAppointment);
+
+router.get('/pagination', getAppointmentsPagination);
 
 module.exports = router;
