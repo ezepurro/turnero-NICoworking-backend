@@ -19,8 +19,9 @@ const getAppointments = async ( req, res = response ) => {
     }
 }
 
-const createAppointment = async ( req, res = response ) => {
-    const { userId, date, time, sessionLength, sessionZones, contact, type } = req.body;
+const createAppointment = async (req, res = response) => {
+    const { userId, date, sessionLength, sessionZones, contact, type } = req.body;
+
     try {
         // Verifico que existe el usuario
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -31,21 +32,24 @@ const createAppointment = async ( req, res = response ) => {
             });
         }
 
-        // Almaceno en la db
+        // Convertir la fecha a un objeto Date en JavaScript
+        const horaInicio = new Date(date);
+        const horaFin = new Date(horaInicio.getTime() + sessionLength * 60000); // Sumar minutos
+
+        // Almaceno en la DB
         const appointment = await prisma.appointment.create({
             data: {
                 clientId: userId,
-                date,
-                time,
+                date: horaInicio,
+                horaInicio,
+                horaFin,
                 sessionLength,
                 sessionZones,
                 contact,
                 type
-                // client: {
-                //     connect: { id: userId }, // Conectar el appointment con el usuario existente
-                //   },
             }
         });
+
         res.json({
             ok: true,
             appointment
@@ -57,7 +61,8 @@ const createAppointment = async ( req, res = response ) => {
             msg: 'No se ha podido completar la petición'
         });
     }
-}
+};
+
 
 const getUserAppointments = async ( req, res = response ) => {
     const userId = req.params.id;
@@ -158,6 +163,53 @@ const deleteAppointment = async ( req, res = response ) => {
     }
 }
 
+const getEmptySpaces = async (req, res) => {
+    const { fecha, duracion } = req.query; 
+
+    const turnos = await prisma.appointment.findMany({
+        where: { date: new Date(fecha) },
+        orderBy: { horaInicio: "asc" }
+    });
+
+    const horarioTrabajo = { inicio: "09:00", fin: "18:00" };
+    let huecos = [];
+    let horaActual = new Date(`${fecha}T${horarioTrabajo.inicio}:00`);
+
+    for (let turno of turnos) {
+        let inicioTurno = new Date(turno.horaInicio);
+        let finTurno = new Date(turno.horaFin);
+
+        // Si hay espacio entre el último turno registrado y el nuevo turno
+        if (inicioTurno > horaActual) {
+            let minutosDisponibles = (inicioTurno - horaActual) / 60000;
+            if (minutosDisponibles >= duracion) {
+                huecos.push({
+                    horaInicio: horaActual.toTimeString().slice(0, 5),
+                    horaFin: inicioTurno.toTimeString().slice(0, 5),
+                    duracion: minutosDisponibles
+                });
+            }
+        }
+
+        // Actualizar la hora actual al final del turno
+        horaActual = finTurno;
+    }
+
+    // Verificar si queda tiempo al final del día
+    let finJornada = new Date(`${fecha}T${horarioTrabajo.fin}:00`);
+    let minutosDisponibles = (finJornada - horaActual) / 60000;
+    if (minutosDisponibles >= duracion) {
+        huecos.push({
+            horaInicio: horaActual.toTimeString().slice(0, 5),
+            horaFin: finJornada.toTimeString().slice(0, 5),
+            duracion: minutosDisponibles
+        });
+    }
+
+    res.json({ huecos });
+};
+
+
 const getWaxAppointments = async ( req, res = response ) => {
     try {
         const waxAppointments = await prisma.appointment.findMany({ where: { type: 'Depilación' } });
@@ -175,6 +227,7 @@ const getWaxAppointments = async ( req, res = response ) => {
 }
 
 module.exports = {
+    getEmptySpaces,
     getAppointments,
     getWaxAppointments,
     getUserAppointments,
