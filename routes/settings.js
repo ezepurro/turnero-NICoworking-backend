@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const { getCalendarSettings, addDatesToCalendarSettings, removeDateFromCalendarSettings } = require('../controllers/settings');
+import express from "express";
+const settingsRouter = express.Router();
+import { getCalendarSettings, addDatesToCalendarSettings, removeDateFromCalendarSettings } from "../controllers/settings.js";
 
-router.get('/', getCalendarSettings);
+settingsRouter.get('/', getCalendarSettings);
 
-router.put('/wax', addDatesToCalendarSettings);
+settingsRouter.put('/wax', addDatesToCalendarSettings);
 
-router.delete('/wax', removeDateFromCalendarSettings);
+settingsRouter.delete('/wax', removeDateFromCalendarSettings);
 
-module.exports = router;
+export default settingsRouter;

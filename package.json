@@ -2,6 +2,7 @@
   "name": "turnero-nicoworking-backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
@@ -17,7 +18,9 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-validator": "^7.2.0",
+    "jscodeshift": "^17.1.2",
     "jsonwebtoken": "^9.0.2",
+    "mercadopago": "^2.3.0",
     "nodemon": "^3.1.9"
   }
 }

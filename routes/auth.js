@@ -1,14 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { check } = require('express-validator');
+import express from "express";
+const authRouter = express.Router();
+import { check } from "express-validator";
 
-const { fieldValidator } = require('../middlewares/field-validator');
-const { JSWValidator } = require('../middlewares/jwt-validator');
-const { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } = require('../controllers/auth');
+import { fieldValidator } from "../middlewares/field-validator.js";
+import { JSWValidator } from "../middlewares/jwt-validator.js";
+import { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } from "../controllers/auth.js";
 
 
 
-router.post('/register', 
+authRouter.post('/register', 
     [
         check('name', 'El nombre es obligatorio').not().isEmpty(),
         check('email', 'El email es obligatorio').isEmail(),
@@ -18,7 +18,7 @@ router.post('/register',
     registerUser
 );
 
-router.post('/login', 
+authRouter.post('/login', 
     [
         check('email', 'El email es obligatorio').isEmail(),
         check('password', 'La contraseña debe tener al menos 7 caracteres').isLength({min: 7}),
@@ -27,14 +27,14 @@ router.post('/login',
     loginUser
 );
 
-router.get('/users', getAllUsers);
+authRouter.get('/users', getAllUsers);
 
-router.get('/users/:id', getUserById);
+authRouter.get('/users/:id', getUserById);
 
-router.put('/users/:id', updateUserById);
+authRouter.put('/users/:id', updateUserById);
 
-router.delete('/users/:id', deleteUserById);
+authRouter.delete('/users/:id', deleteUserById);
 
-router.get('/renew', JSWValidator, renewToken);
+authRouter.get('/renew', JSWValidator, renewToken);
 
-module.exports = router;
+export default authRouter;

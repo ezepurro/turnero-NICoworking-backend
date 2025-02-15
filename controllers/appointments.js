@@ -1,9 +1,9 @@
-const { response } = require('express');
-const { PrismaClient } = require('@prisma/client');
+import { response } from "express";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const getAppointments = async ( req, res = response ) => {
+export const getAppointments = async ( req, res = response ) => {
     try {
         const appointments = await prisma.appointment.findMany();
         res.json({
@@ -19,7 +19,7 @@ const getAppointments = async ( req, res = response ) => {
     }
 }
 
-const createAppointment = async ( req, res = response ) => {
+export const createAppointment = async ( req, res = response ) => {
     const { userId, date, time, sessionLength, sessionZones, contact, type } = req.body;
     try {
         // Verifico que existe el usuario
@@ -59,7 +59,7 @@ const createAppointment = async ( req, res = response ) => {
     }
 }
 
-const getUserAppointments = async ( req, res = response ) => {
+export const getUserAppointments = async ( req, res = response ) => {
     const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -83,7 +83,7 @@ const getUserAppointments = async ( req, res = response ) => {
     }
 }
 
-const updateAppointment = async ( req, res = response ) => {
+export const updateAppointment = async ( req, res = response ) => {
     const id = req.params.id;
     const { userId, date, time, sessionLength, sessionZones, contact, type } = req.body;
     try {
@@ -131,7 +131,7 @@ const updateAppointment = async ( req, res = response ) => {
     }
 }
 
-const deleteAppointment = async ( req, res = response ) => {
+export const deleteAppointment = async ( req, res = response ) => {
     const id = req.params.id;
     try {
         // Verifico que existe la cita
@@ -158,7 +158,7 @@ const deleteAppointment = async ( req, res = response ) => {
     }
 }
 
-const getWaxAppointments = async ( req, res = response ) => {
+export const getWaxAppointments = async ( req, res = response ) => {
     try {
         const waxAppointments = await prisma.appointment.findMany({ where: { type: 'Depilación' } });
         res.json({
@@ -174,7 +174,7 @@ const getWaxAppointments = async ( req, res = response ) => {
     }
 }
 
-const getAppointmentsPagination = async (req, res = response) => {
+export const getAppointmentsPagination = async (req, res = response) => {
     try {
         // ?page=1&limit=10
         const page = parseInt(req.query.page) || 1; 
@@ -205,13 +205,3 @@ const getAppointmentsPagination = async (req, res = response) => {
     }
 };
 
-
-module.exports = {
-    createAppointment,
-    deleteAppointment,
-    getAppointments,
-    getAppointmentsPagination,
-    getWaxAppointments,
-    getUserAppointments,
-    updateAppointment,
-}

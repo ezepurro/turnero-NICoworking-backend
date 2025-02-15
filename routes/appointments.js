@@ -1,17 +1,17 @@
-const express = require('express');
-const router = express.Router();
-const { check } = require('express-validator');
-const { fieldValidator } = require('../middlewares/field-validator');
-const { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination } = require('../controllers/appointments');
+import express from "express";
+const appointmentRouter = express.Router();
+import { check } from "express-validator";
+import { fieldValidator } from "../middlewares/field-validator.js";
+import { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination } from "../controllers/appointments.js";
 
 
-router.get('/', getAppointments);
+appointmentRouter.get('/', getAppointments);
 
-router.get('/waxing', getWaxAppointments);
+appointmentRouter.get('/waxing', getWaxAppointments);
 
-router.get('/users/:id', getUserAppointments);
+appointmentRouter.get('/users/:id', getUserAppointments);
 
-router.post('/', 
+appointmentRouter.post('/', 
     [
         check('contact', 'La información de contacto es obligatoria').not().isEmpty(),
         check('date', 'La fecha es obligatoria').not().isEmpty(),
@@ -20,10 +20,10 @@ router.post('/',
     createAppointment
 );
 
-router.put('/:id', updateAppointment);
+appointmentRouter.put('/:id', updateAppointment);
 
-router.delete('/:id', deleteAppointment);
+appointmentRouter.delete('/:id', deleteAppointment);
 
-router.get('/pagination', getAppointmentsPagination);
+appointmentRouter.get('/pagination', getAppointmentsPagination);
 
-module.exports = router;
+export default appointmentRouter;
