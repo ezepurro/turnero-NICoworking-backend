@@ -1,11 +1,11 @@
-const { response } = require('express');
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-const { generateJWT } = require('../helpers/jwt');
+import { response } from "express";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { generateJWT } from "../helpers/jwt.js";
 
 const prisma = new PrismaClient();
 
-const registerUser = async ( req, res = response ) => {
+export const registerUser = async ( req, res = response ) => {
 
     const { name, email, password, contact } = req.body;
 
@@ -34,7 +34,7 @@ const registerUser = async ( req, res = response ) => {
             ok: true,
             uid: user.id,
             name: user.name,
-	    isAdmin: user.isAdmin,
+	        isAdmin: user.isAdmin,
             token
         });
     } catch (error) {
@@ -46,7 +46,7 @@ const registerUser = async ( req, res = response ) => {
     }
 }
 
-const loginUser = async ( req, res = response ) => {
+export const loginUser = async ( req, res = response ) => {
 
     const { email, password } = req.body;
 
@@ -76,7 +76,7 @@ const loginUser = async ( req, res = response ) => {
             ok: true,
             uid: user.id,
             name: user.name,
-	    isAdmin: user.isAdmin,
+	        isAdmin: user.isAdmin,
             token
         });
     } catch (error) {
@@ -88,7 +88,7 @@ const loginUser = async ( req, res = response ) => {
     }
 }
 
-const getAllUsers = async ( req, res = response ) => {
+export const getAllUsers = async ( req, res = response ) => {
     try {
         const users = await prisma.user.findMany();
         res.json({
@@ -104,7 +104,7 @@ const getAllUsers = async ( req, res = response ) => {
     }
 }
 
-const getUserById = async ( req, res = response ) => {
+export const getUserById = async ( req, res = response ) => {
     const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({ where: { id: userId }, include: { appointments: true } });
@@ -127,7 +127,7 @@ const getUserById = async ( req, res = response ) => {
     }
 }
 
-const updateUserById = async ( req, res = response ) => {
+export const updateUserById = async ( req, res = response ) => {
     const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -151,7 +151,7 @@ const updateUserById = async ( req, res = response ) => {
     }
 }
 
-const deleteUserById = async ( req, res = response ) => {
+export const deleteUserById = async ( req, res = response ) => {
     const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -176,7 +176,7 @@ const deleteUserById = async ( req, res = response ) => {
 }
 
 
-const renewToken = async (req, res = response) => {
+export const renewToken = async (req, res = response) => {
     const { uid, name } = req;
     const token = await generateJWT( uid, name );
     res.json({
@@ -185,12 +185,3 @@ const renewToken = async (req, res = response) => {
     });
 }
 
-module.exports = {
-    deleteUserById,
-    getAllUsers,
-    getUserById,
-    loginUser,
-    registerUser,
-    renewToken,
-    updateUserById
-}

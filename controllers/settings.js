@@ -1,10 +1,10 @@
-const { response } = require('express');
-const { PrismaClient } = require('@prisma/client');
-require('dotenv').config();
+import { response } from "express";
+import { PrismaClient } from "@prisma/client";
+import 'dotenv/config';
 
 const prisma = new PrismaClient();
 
-const getCalendarSettings = async ( req, res = response ) => {
+export const getCalendarSettings = async ( req, res = response ) => {
     try {
         const calendarSettings = await prisma.calendarSettings.findFirst();
         res.json({
@@ -20,7 +20,7 @@ const getCalendarSettings = async ( req, res = response ) => {
     }
 }
 
-const addDatesToCalendarSettings = async ( req, res = response ) => {
+export const addDatesToCalendarSettings = async ( req, res = response ) => {
     const { newDates } = req.body;
     const id = process.env.CALENDARID;
     try {
@@ -66,7 +66,7 @@ const addDatesToCalendarSettings = async ( req, res = response ) => {
 }
 
 
-const removeDateFromCalendarSettings = async (req, res) => {
+export const removeDateFromCalendarSettings = async (req, res) => {
     const { date } = req.query;
     const calendarId = process.env.CALENDARID;
 
@@ -140,8 +140,3 @@ const removeDateFromCalendarSettings = async (req, res) => {
 
 
 
-module.exports = {
-    addDatesToCalendarSettings,
-    getCalendarSettings,
-    removeDateFromCalendarSettings,
-}
