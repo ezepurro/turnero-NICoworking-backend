@@ -2,21 +2,22 @@ import express from "express";
 const mpRouter = express.Router();
 import { MercadoPagoConfig,Preference } from "mercadopago";
 const client = new MercadoPagoConfig({
-    accesToken: "",
+    accessToken: "APP_USR-7654258103486190-021800-616d2c76c8b61ef54e881915561e4826-2273376235",
 })
 
 mpRouter.post('/create_preference',async (req,res) => {
     try {
+        const { price, schedule, duration, zonesAmmount } = req.body;
         const body = {
             items: [{
-                zonesAmmount: req.body.zonesAmmount,
-                duration: req.body.duration,
-                schedule: req.body.schedule,
-                unit_price: Number(req.body.price),
-                currency_id : 'ARS'
+                title: `Reserva - ${zonesAmmount} zonas`,
+                    description: `Duración: ${duration} minutos, Fecha: ${schedule}`,
+                    quantity: 1, 
+                    unit_price: Number(price), 
+                    currency_id: "ARS",
             }],
             back_urls: {
-                succes: 'https://www.youtube.com/@quieroserprogramador3781',
+                success: 'https://www.youtube.com/@quieroserprogramador3781',
                 failure: 'https://www.youtube.com/@quieroserprogramador3781',
                 pending: 'https://www.youtube.com/@quieroserprogramador3781',
             },
@@ -24,12 +25,14 @@ mpRouter.post('/create_preference',async (req,res) => {
         }
     const preference = new Preference(client)
     const result = await preference.create({ body })
+    console.log(result.id)
     res.json({
         id:result.id,
     })
     }
     catch (error) {
         console.log(error)
+        res.status(500).json({ error: "Error al procesar la solicitud" })
     }
 }) 
 export default mpRouter

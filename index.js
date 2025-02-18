@@ -21,7 +21,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/settings', settingsRouter);
-app.use('/mercadopago', mpRouter);
+app.use('/api/mercadopago', mpRouter);
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {
