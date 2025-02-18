@@ -9,7 +9,7 @@ import mpRouter from './routes/mercadoPago.js';
 // Crear el servidor de express
 const app = express();
 
-// Cors
+
 app.use(cors());
 
 // Lecutra y parseo del body
