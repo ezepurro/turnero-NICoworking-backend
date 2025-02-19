@@ -1,17 +1,20 @@
 import express from "express";
-const mpRouter = express.Router();
-import { MercadoPagoConfig,Preference } from "mercadopago";
-const client = new MercadoPagoConfig({
-    accessToken: "APP_USR-7654258103486190-021800-616d2c76c8b61ef54e881915561e4826-2273376235",
-})
+import { MercadoPagoConfig, Preference } from "mercadopago";
 
-mpRouter.post('/create_preference',async (req,res) => {
+const mpRouter = express.Router();
+
+const client = new MercadoPagoConfig({
+    accessToken: process.env.MP_ACCESS_TOKEN,
+});
+
+mpRouter.post('/create_preference', async ( req, res ) => {
     try {
-        const { price, schedule, duration, zonesAmmount } = req.body;
+        const { price, schedule, zonesAmmount } = req.body;
+        const title = (zonesAmmount === 'Full-Body') ? 'Reserva de turno - Full-Body' : `Reserva de turno - ${zonesAmmount} zonas`;
         const body = {
             items: [{
-                title: `Reserva - ${zonesAmmount} zonas`,
-                    description: `Duración: ${duration} minutos, Fecha: ${schedule}`,
+                title: title,
+                    description: `Fecha: ${schedule}`,
                     quantity: 1, 
                     unit_price: Number(price), 
                     currency_id: "ARS",
@@ -23,16 +26,16 @@ mpRouter.post('/create_preference',async (req,res) => {
             },
             auto_return : 'approved',
         }
-    const preference = new Preference(client)
-    const result = await preference.create({ body })
-    console.log(result.id)
-    res.json({
-        id:result.id,
-    })
+
+        const preference = new Preference(client);
+        const result = await preference.create({ body });
+        res.json({
+            id:result.id,
+        });
     }
     catch (error) {
-        console.log(error)
-        res.status(500).json({ error: "Error al procesar la solicitud" })
+        res.status(500).json({ error: "Error al procesar la solicitud" });
     }
 }) 
-export default mpRouter
+
+export default mpRouter;
