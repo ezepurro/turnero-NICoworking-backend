@@ -2,7 +2,7 @@ import express from "express";
 const mpRouter = express.Router();
 import { MercadoPagoConfig,Preference } from "mercadopago";
 const client = new MercadoPagoConfig({
-    accessToken: "APP_USR-7654258103486190-021800-616d2c76c8b61ef54e881915561e4826-2273376235",
+    accessToken: "APP_USR-5555575217321704-021919-56ce7ed2e8ed41843ba517cb872f5193-2280252918",
 })
 
 mpRouter.post('/create_preference',async (req,res) => {
@@ -17,11 +17,14 @@ mpRouter.post('/create_preference',async (req,res) => {
                     currency_id: "ARS",
             }],
             back_urls: {
-                success: 'https://www.youtube.com/@quieroserprogramador3781',
+                success: 'http://localhost:5173 ',
                 failure: 'https://www.youtube.com/@quieroserprogramador3781',
                 pending: 'https://www.youtube.com/@quieroserprogramador3781',
             },
             auto_return : 'approved',
+            //Aca en la notification url utlizamos la url que nos provee Ngrok
+            //Cuando hagamos el deploy colocamos la url en la que esta alojado nuestro backend
+            notification_url: 'https://2ac0-181-111-46-5.ngrok-free.app/api/mercadopago/webhook'
         }
     const preference = new Preference(client)
     const result = await preference.create({ body })
@@ -35,4 +38,10 @@ mpRouter.post('/create_preference',async (req,res) => {
         res.status(500).json({ error: "Error al procesar la solicitud" })
     }
 }) 
+mpRouter.post('/webhook',async (req, res) => {
+    const payment = req.query
+    console.log({payment})
+})
+
+
 export default mpRouter
