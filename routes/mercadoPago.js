@@ -34,7 +34,9 @@ mpRouter.post('/create_preference', async ( req, res ) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: "Error al procesar la solicitud" });
+        console.error("Error en Mercado Pago:", error);
+        res.status(500).json({ error: error.message || "Error al procesar la solicitud" });
+        // res.status(500).json({ error: "Error al procesar la solicitud" });
     }
 }) 
 
