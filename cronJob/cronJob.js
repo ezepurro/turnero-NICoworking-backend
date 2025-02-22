@@ -1,7 +1,7 @@
-const cron = require("node-cron");
-const moment = require("moment");
-const { PrismaClient } = require("@prisma/client");
-const sendWhatsAppMessage = require("./whatsappService");
+import cron from "node-cron";
+import moment from "moment";
+import { PrismaClient } from "@prisma/client";
+import sendWhatsAppMessage from "./whatsappService.js";
 
 const prisma = new PrismaClient();
 

@@ -15,7 +15,6 @@ app.use(cors());
 // Lecutra y parseo del body
 app.use(express.json());
 
-
 // Rutas
 app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentRouter);
@@ -23,6 +22,7 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/mercadopago', mpRouter);
 
 // Escuchar peticiones
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, async () => {
     console.log(`Servidor corriendo en puerto ${process.env.PORT}`);
+    await import("./cronJob/cronJob.js");
 });

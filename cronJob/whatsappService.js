@@ -1,12 +1,12 @@
-const axios = require("axios");
-require("dotenv").config();
+import axios from "axios";
+import dotenv from "dotenv";
 
+dotenv.config();
 
 const WHATSAPP_API_URL = `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_NUMBER}/messages`;
-const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN; 
+const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 
-
-const sendWhatsAppMessage = async ( phoneNumber, messageData ) => {
+const sendWhatsAppMessage = async (phoneNumber, messageData) => {
     try {
         const response = await axios.post(
             WHATSAPP_API_URL,
@@ -44,4 +44,4 @@ const sendWhatsAppMessage = async ( phoneNumber, messageData ) => {
     }
 };
 
-module.exports = sendWhatsAppMessage;
+export default sendWhatsAppMessage;
