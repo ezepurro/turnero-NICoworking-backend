@@ -1,10 +1,8 @@
 import axios from "axios";
-import dotenv from "dotenv";
+import config from "../config.js";
 
-dotenv.config();
-
-const WHATSAPP_API_URL = `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_NUMBER}/messages`;
-const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+const WHATSAPP_API_URL = `https://graph.facebook.com/v21.0/${config.WHATSAPP_NUMBER}/messages`;
+const ACCESS_TOKEN = config.WHATSAPP_ACCESS_TOKEN;
 
 const sendWhatsAppMessage = async (phoneNumber, messageData) => {
     try {

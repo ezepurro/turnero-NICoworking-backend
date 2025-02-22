@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config';
+import config from "./config.js";
 import appointmentRouter from './routes/appointments.js';
 import authRouter from './routes/auth.js';
 import settingsRouter from './routes/settings.js';
@@ -23,6 +23,6 @@ app.use('/api/mercadopago', mpRouter);
 
 // Escuchar peticiones
 app.listen(process.env.PORT, async () => {
-    console.log(`Servidor corriendo en puerto ${process.env.PORT}`);
+    console.log(`Servidor corriendo en puerto ${config.PORT}`);
     await import("./cronJob/cronJob.js");
 });

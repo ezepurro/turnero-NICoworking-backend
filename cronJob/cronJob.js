@@ -15,7 +15,7 @@ cron.schedule("0 9 * * *", async () => {
         // Obtiene las citas programadas para mañana
         const appointments = await prisma.appointment.findMany({
             where: { date: tomorrow },
-            include: { client: true }, // Para obtener los datos del cliente
+            include: { client: true },
         });
 
         for (const appointment of appointments) {

@@ -41,9 +41,6 @@ export const createAppointment = async ( req, res = response ) => {
                 sessionZones,
                 contact,
                 type
-                // client: {
-                //     connect: { id: userId }, // Conectar el appointment con el usuario existente
-                //   },
             }
         });
         res.json({
