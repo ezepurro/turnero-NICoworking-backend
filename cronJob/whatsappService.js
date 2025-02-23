@@ -14,7 +14,7 @@ const sendWhatsAppMessage = async (phoneNumber, messageData) => {
                 type: "template",
                 template: {
                     name: "recordatorio_turno",
-                    language: { code: "es" },
+                    language: { code: "es_AR" },
                     components: [
                         {
                             type: "body",
