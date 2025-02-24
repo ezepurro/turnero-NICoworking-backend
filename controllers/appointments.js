@@ -158,9 +158,35 @@ export const deleteAppointment = async ( req, res = response ) => {
     }
 }
 
-export const getWaxAppointments = async ( req, res = response ) => {
+// Para traer todas las fechas (incluidas las pasadas)
+// export const getWaxAppointments = async ( req, res = response ) => {
+//     try {
+//         const waxAppointments = await prisma.appointment.findMany({ where: { type: 'Depilación' } });
+//         res.json({
+//             ok: true,
+//             waxAppointments
+//         });
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({
+//             ok: false,
+//             msg: 'No se ha podido completar la petición'
+//         });
+//     }
+// }
+
+// Para traer solo las fechas futuras
+export const getWaxAppointments = async (req, res = response) => {
     try {
-        const waxAppointments = await prisma.appointment.findMany({ where: { type: 'Depilación' } });
+        const currentDate = new Date(); 
+        const waxAppointments = await prisma.appointment.findMany({
+            where: {
+                type: 'Depilación',
+                date: {
+                    gt: currentDate 
+                }
+            }
+        });
         res.json({
             ok: true,
             waxAppointments
@@ -172,7 +198,8 @@ export const getWaxAppointments = async ( req, res = response ) => {
             msg: 'No se ha podido completar la petición'
         });
     }
-}
+};
+
 
 export const getAppointmentsPagination = async (req, res = response) => {
     try {
