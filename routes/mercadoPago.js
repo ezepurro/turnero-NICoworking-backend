@@ -24,7 +24,7 @@ mpRouter.post('/create_preference',async (req,res) => {
             auto_return : 'approved',
             //Aca en la notification url utlizamos la url que nos provee Ngrok
             //Cuando hagamos el deploy colocamos la url en la que esta alojado nuestro backend
-            notification_url: 'https://2ac0-181-111-46-5.ngrok-free.app/api/mercadopago/webhook'
+            notification_url: 'https://c8c3-181-111-46-5.ngrok-free.app/api/mercadopago/webhook'
         }
     const preference = new Preference(client)
     const result = await preference.create({ body })
@@ -40,8 +40,26 @@ mpRouter.post('/create_preference',async (req,res) => {
 }) 
 mpRouter.post('/webhook',async (req, res) => {
     const payment = req.query
-    console.log({payment})
-})
+    console.log(payment)
+    const paymentId = req.query.id;
 
+    try {
+        const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${client.accessToken}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+        }
+        res.sendStatus(200)
+    }
+    catch (error) {
+        console.error('Error:', error);
+        res.sendStatus(500)
+    }
+})
 
 export default mpRouter
