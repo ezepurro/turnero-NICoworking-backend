@@ -1,5 +1,6 @@
 import { response } from "express";
 import jwt from "jsonwebtoken";
+import config from "../config.js";
 
 
 export const JSWValidator = ( req, res = response, next ) => {
@@ -13,7 +14,7 @@ export const JSWValidator = ( req, res = response, next ) => {
     }
 
     try {
-        const { uid, name } = jwt.verify( token, process.env.SECRET_JWT_SEED );
+        const { uid, name } = jwt.verify( token, config.SECRET_JWT_SEED );
         req.uid = uid;
         req.name = name;
     } catch (error) {

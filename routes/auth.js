@@ -1,11 +1,9 @@
 import express from "express";
 const authRouter = express.Router();
 import { check } from "express-validator";
-
 import { fieldValidator } from "../middlewares/field-validator.js";
 import { JSWValidator } from "../middlewares/jwt-validator.js";
 import { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } from "../controllers/auth.js";
-
 
 
 authRouter.post('/register', 
