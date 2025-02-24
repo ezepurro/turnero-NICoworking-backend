@@ -1,8 +1,9 @@
 import express from "express";
 const mpRouter = express.Router();
 import { MercadoPagoConfig,Preference } from "mercadopago";
+
 const client = new MercadoPagoConfig({
-    accessToken: "APP_USR-5555575217321704-021919-56ce7ed2e8ed41843ba517cb872f5193-2280252918",
+    accessToken: process.env.MP_ACCESS_TOKEN,
 })
 
 mpRouter.post('/create_preference',async (req,res) => {
@@ -62,4 +63,4 @@ mpRouter.post('/webhook',async (req, res) => {
     }
 })
 
-export default mpRouter
+export default mpRouter;
