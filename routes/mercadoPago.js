@@ -25,7 +25,7 @@ mpRouter.post('/create_preference', async (req, res) => {
                 pending: 'https://www.youtube.com/@quieroserprogramador3781',
             },
             auto_return: 'approved',
-            notification_url: 'https://c8c3-181-111-46-5.ngrok-free.app/api/mercadopago/webhook'
+            notification_url: 'https://7a9f-181-110-128-225.ngrok-free.app/api/mercadopago/webhook'
         };
 
         const preference = new Preference(client);
