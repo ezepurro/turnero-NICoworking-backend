@@ -1,6 +1,6 @@
 import { response } from "express";
 import { PrismaClient } from "@prisma/client";
-import 'dotenv/config';
+import config from "../config.js";
 
 const prisma = new PrismaClient();
 
@@ -22,7 +22,7 @@ export const getCalendarSettings = async ( req, res = response ) => {
 
 export const addDatesToCalendarSettings = async ( req, res = response ) => {
     const { newDates } = req.body;
-    const id = process.env.CALENDARID;
+    const id = config.CALENDARID;
     try {
         if (!id) {
             return res.status(500).json({
@@ -68,7 +68,7 @@ export const addDatesToCalendarSettings = async ( req, res = response ) => {
 
 export const removeDateFromCalendarSettings = async (req, res) => {
     const { date } = req.query;
-    const calendarId = process.env.CALENDARID;
+    const calendarId = config.CALENDARID;
 
     try {
         if (!date) {
