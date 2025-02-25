@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import moment from "moment";
 import { PrismaClient } from "@prisma/client";
+import { formatPhoneNumber } from "../helpers/formatPhoneNumber.js";
 import sendWhatsAppMessage from "./whatsappService.js";
 
 const prisma = new PrismaClient();
@@ -23,7 +24,7 @@ cron.schedule("0 9 * * *", async () => {
                 date: moment(appointment.date).format("DD/MM/YYYY"),
                 time: moment(appointment.date).format("HH:mm"),
             };
-            await sendWhatsAppMessage(appointment.client.contact, messageData);
+            await sendWhatsAppMessage(formatPhoneNumber(appointment.contact), messageData);
         }
 
         console.log("Recordatorios enviados.");
