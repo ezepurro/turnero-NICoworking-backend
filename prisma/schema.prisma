@@ -28,6 +28,7 @@ model Appointment {
   sessionZones  Int?
   contact       String
   type          String
+  status        String?
 }
 
 model CalendarSettings {

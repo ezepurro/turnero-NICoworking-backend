@@ -1,6 +1,7 @@
 import express from "express";
 import { MercadoPagoConfig, Preference } from "mercadopago";
-
+import {  PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient()
 const mpRouter = express.Router();
 
 const client = new MercadoPagoConfig({
@@ -9,7 +10,7 @@ const client = new MercadoPagoConfig({
 
 mpRouter.post('/create_preference', async (req, res) => {
     try {
-        const { price, schedule, zonesAmmount } = req.body;
+        const { price, schedule, zonesAmmount, appointmentId } = req.body;
         const title = (zonesAmmount === 'Full-Body') ? 'Reserva de turno - Full-Body' : `Reserva de turno - ${zonesAmmount} zonas`;
         const body = {
             items: [{
@@ -25,7 +26,8 @@ mpRouter.post('/create_preference', async (req, res) => {
                 pending: 'https://www.youtube.com/@quieroserprogramador3781',
             },
             auto_return: 'approved',
-            notification_url: 'https://c8c3-181-111-46-5.ngrok-free.app/api/mercadopago/webhook'
+            notification_url: 'https://9fc3-181-111-46-5.ngrok-free.app/api/mercadopago/webhook',
+            external_reference: appointmentId
         };
 
         const preference = new Preference(client);
@@ -53,7 +55,18 @@ mpRouter.post('/webhook', async (req, res) => {
         });
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            if (data.status == 'approved') {
+                const appointmentId = data.external_reference;
+                console.log(data.external_reference);
+                if (appointmentId) {
+                    const updatedAppointment = await prisma.appointment.update({
+                        where: { id: appointmentId },
+                        data: {
+                            status: 'paid'
+                        }
+                    });
+                }
+            }
         }
         res.sendStatus(200);
     } catch (error) {
