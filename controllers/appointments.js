@@ -20,7 +20,7 @@ export const getAppointments = async ( req, res = response ) => {
 }
 
 export const createAppointment = async ( req, res = response ) => {
-    const { userId, date, time, sessionLength, sessionZones, contact, type } = req.body;
+    const { userId, date, time, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
         // Verifico que existe el usuario
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -40,7 +40,8 @@ export const createAppointment = async ( req, res = response ) => {
                 sessionLength,
                 sessionZones,
                 contact,
-                type
+                type,
+                status
             }
         });
         res.json({
@@ -82,7 +83,7 @@ export const getUserAppointments = async ( req, res = response ) => {
 
 export const updateAppointment = async ( req, res = response ) => {
     const id = req.params.id;
-    const { userId, date, time, sessionLength, sessionZones, contact, type } = req.body;
+    const { userId, date, time, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
         // Verifico que existe el usuario
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -112,7 +113,8 @@ export const updateAppointment = async ( req, res = response ) => {
                 sessionLength,
                 sessionZones,
                 contact,
-                type
+                type,
+                status
             }
         });
         res.json({

@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 
 // Programa la tarea para ejecutarse todos los días a las 9 AM
 cron.schedule("0 9 * * *", async () => {
-
     try {
         const startOfTomorrow = moment().add(1, "day").startOf("day").toDate(); 
         const endOfTomorrow = moment().add(1, "day").endOf("day").toDate();     
