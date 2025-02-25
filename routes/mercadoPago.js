@@ -1,11 +1,13 @@
 import express from "express";
+import config from "../config.js";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import {  PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient()
 const mpRouter = express.Router();
 
 const client = new MercadoPagoConfig({
-    accessToken: process.env.MP_ACCESS_TOKEN,
+    accessToken: config.MP_ACCESS_TOKEN,
 });
 
 mpRouter.post('/create_preference', async (req, res) => {
@@ -21,12 +23,12 @@ mpRouter.post('/create_preference', async (req, res) => {
                 currency_id: "ARS",
             }],
             back_urls: {
-                success: 'http://localhost:5173',
-                failure: 'https://www.youtube.com/@quieroserprogramador3781',
-                pending: 'https://www.youtube.com/@quieroserprogramador3781',
+                success: `${config.FRONTEND_BASE_URL}/appointments`,
+                failure: `${config.FRONTEND_BASE_URL}/`,
+                pending: `${config.FRONTEND_BASE_URL}/`,
             },
             auto_return: 'approved',
-            notification_url: 'https://9fc3-181-111-46-5.ngrok-free.app/api/mercadopago/webhook',
+            notification_url: config.NGROK_WEBHOOK_URL,
             external_reference: appointmentId
 
         };
@@ -38,7 +40,6 @@ mpRouter.post('/create_preference', async (req, res) => {
     catch (error) {
         console.error("Error en Mercado Pago:", error);
         res.status(500).json({ error: error.message || "Error al procesar la solicitud" });
-        // res.status(500).json({ error: "Error al procesar la solicitud" });
     }
 });
 
@@ -60,7 +61,7 @@ mpRouter.post('/webhook', async (req, res) => {
                 const appointmentId = data.external_reference;
                 console.log(data.external_reference);
                 if (appointmentId) {
-                    const updatedAppointment = await prisma.appointment.update({
+                    await prisma.appointment.update({
                         where: { id: appointmentId },
                         data: {
                             status: 'paid'

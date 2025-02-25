@@ -10,6 +10,8 @@ const config = {
     MP_ACCESS_TOKEN: process.env.MP_ACCESS_TOKEN,
     WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN,
     WHATSAPP_NUMBER: process.env.WHATSAPP_NUMBER,
+    FRONTEND_BASE_URL: process.env.FRONTEND_BASE_URL,
+    NGROK_WEBHOOK_URL: process.env.NGROK_WEBHOOK_URL,
 };
 
 const requiredEnvVars = [
@@ -19,6 +21,8 @@ const requiredEnvVars = [
     "MP_ACCESS_TOKEN",
     "WHATSAPP_ACCESS_TOKEN",
     "WHATSAPP_NUMBER",
+    "FRONTEND_BASE_URL",
+    "NGROK_WEBHOOK_URL",
 ];
 
 const missingVars = requiredEnvVars.filter((key) => !config[key]);
