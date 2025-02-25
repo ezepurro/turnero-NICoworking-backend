@@ -45,7 +45,6 @@ mpRouter.post('/create_preference', async (req, res) => {
 
 mpRouter.post('/webhook', async (req, res) => {
     const payment = req.query;
-    console.log(payment);
     const paymentId = req.query.id;
 
     try {
@@ -59,7 +58,6 @@ mpRouter.post('/webhook', async (req, res) => {
             const data = await response.json();
             if (data.status == 'approved') {
                 const appointmentId = data.external_reference;
-                console.log(data.external_reference);
                 if (appointmentId) {
                     await prisma.appointment.update({
                         where: { id: appointmentId },

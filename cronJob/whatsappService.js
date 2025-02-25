@@ -35,8 +35,6 @@ const sendWhatsAppMessage = async (phoneNumber, messageData) => {
                 }
             }
         );
-
-        console.log(`Mensaje enviado a ${phoneNumber}:`);
     } catch (error) {
         console.error(`Error al enviar mensaje a ${phoneNumber}:`, error.response ? error.response.data : error);
     }

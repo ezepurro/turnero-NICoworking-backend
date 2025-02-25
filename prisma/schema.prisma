@@ -28,7 +28,8 @@ model Appointment {
   sessionZones  Int?
   contact       String
   type          String
-  status        String?
+  status        String
+  createdAt     DateTime @default(now()) 
 }
 
 model CalendarSettings {
