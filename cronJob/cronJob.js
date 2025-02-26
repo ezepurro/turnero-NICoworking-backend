@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import "./cleanupExpiredAppointments.js";
+import "./cleanupPastEnabledDays.js";
 import "./sendWhatsAppReminders.js";
 
 const prisma = new PrismaClient();

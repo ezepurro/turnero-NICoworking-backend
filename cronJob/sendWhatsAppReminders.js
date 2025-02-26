@@ -27,7 +27,7 @@ cron.schedule("0 9 * * *", async () => {
             await sendWhatsAppMessage(formatPhoneNumber(appointment.contact), messageData);
         }
 
-        console.log("Recordatorios enviados.");
+        console.log("Recordatorios enviados");
     } catch (error) {
         console.error("Error en la tarea programada:", error);
     }
