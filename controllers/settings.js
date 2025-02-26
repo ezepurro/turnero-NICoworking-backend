@@ -45,6 +45,9 @@ export const addDatesToCalendarSettings = async ( req, res = response ) => {
         // Agrego las nuevas fechas
         const updatedDates = [...calendar.waxDays, ...newDates];
 
+        // Ordeno las fechas por orden cronológico (ascendente)
+        updatedDates.sort((a, b) => new Date(a) - new Date(b));
+
         const updatedCalendar = await prisma.calendarSettings.update({
             where: { id },
             data: {
