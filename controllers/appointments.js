@@ -231,7 +231,7 @@ export const getAppointmentsPagination = async (req, res = response) => {
     }
 };
 
-<<<<<<< HEAD
+
 export const getAvailableSlots = () => {
     async (req, res) => {
         try {
@@ -281,7 +281,7 @@ export const getAvailableSlots = () => {
     };
     
 }
-=======
+
 
 export const checkAppointmentAvailability = async (req, res) => {
     try {
@@ -313,4 +313,4 @@ export const checkAppointmentAvailability = async (req, res) => {
         res.status(500).json({ available: false, message: "Error en el servidor" });
     }
 };
->>>>>>> 3b2363fcd41ea8cf1ba29ad900e5707ca9a0d590
+

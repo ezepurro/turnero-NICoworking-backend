@@ -2,7 +2,7 @@ import express from "express";
 const appointmentRouter = express.Router();
 import { check } from "express-validator";
 import { fieldValidator } from "../middlewares/field-validator.js";
-import { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
+import { getAvailableSlots,getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
 
 
 appointmentRouter.get('/', getAppointments);
