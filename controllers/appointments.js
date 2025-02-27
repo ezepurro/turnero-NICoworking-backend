@@ -1,6 +1,6 @@
 import { response } from "express";
 import { PrismaClient } from "@prisma/client";
-
+import { findAvailableSlots,toMinutes } from "../helpers/appointmentHelpers";
 const prisma = new PrismaClient();
 
 export const getAppointments = async ( req, res = response ) => {
@@ -267,3 +267,4 @@ export const checkAppointmentAvailability = async (req, res) => {
         res.status(500).json({ available: false, message: "Error en el servidor" });
     }
 };
+
