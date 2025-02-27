@@ -231,6 +231,7 @@ export const getAppointmentsPagination = async (req, res = response) => {
     }
 };
 
+<<<<<<< HEAD
 export const getAvailableSlots = () => {
     async (req, res) => {
         try {
@@ -280,3 +281,36 @@ export const getAvailableSlots = () => {
     };
     
 }
+=======
+
+export const checkAppointmentAvailability = async (req, res) => {
+    try {
+        const { date, type } = req.query;
+
+        if (!date) {
+            return res.status(400).json({ available: false, message: "Fecha no proporcionada" });
+        }
+
+        if (!type) {
+            return res.status(400).json({ available: false, message: "Servicio no especificado" });
+        }
+
+        const existingAppointment = await prisma.appointment.findFirst({
+            where: {
+                date: new Date(date),
+                type
+            },
+        });
+
+        if (existingAppointment) {
+            return res.json({ available: false });
+        }
+
+        res.json({ available: true });
+
+    } catch (error) {
+        console.error("Error verificando disponibilidad:", error);
+        res.status(500).json({ available: false, message: "Error en el servidor" });
+    }
+};
+>>>>>>> 3b2363fcd41ea8cf1ba29ad900e5707ca9a0d590
