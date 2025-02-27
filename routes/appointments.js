@@ -2,7 +2,7 @@ import express from "express";
 const appointmentRouter = express.Router();
 import { check } from "express-validator";
 import { fieldValidator } from "../middlewares/field-validator.js";
-import { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination } from "../controllers/appointments.js";
+import { getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
 
 
 appointmentRouter.get('/', getAppointments);
@@ -25,5 +25,7 @@ appointmentRouter.put('/:id', updateAppointment);
 appointmentRouter.delete('/:id', deleteAppointment);
 
 appointmentRouter.get('/pagination', getAppointmentsPagination);
+
+appointmentRouter.get('/check-availability', checkAppointmentAvailability);
 
 export default appointmentRouter;

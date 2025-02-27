@@ -231,3 +231,34 @@ export const getAppointmentsPagination = async (req, res = response) => {
     }
 };
 
+
+export const checkAppointmentAvailability = async (req, res) => {
+    try {
+        const { date, type } = req.query;
+
+        if (!date) {
+            return res.status(400).json({ available: false, message: "Fecha no proporcionada" });
+        }
+
+        if (!type) {
+            return res.status(400).json({ available: false, message: "Servicio no especificado" });
+        }
+
+        const existingAppointment = await prisma.appointment.findFirst({
+            where: {
+                date: new Date(date),
+                type
+            },
+        });
+
+        if (existingAppointment) {
+            return res.json({ available: false });
+        }
+
+        res.json({ available: true });
+
+    } catch (error) {
+        console.error("Error verificando disponibilidad:", error);
+        res.status(500).json({ available: false, message: "Error en el servidor" });
+    }
+};
