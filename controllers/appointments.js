@@ -244,11 +244,16 @@ export const checkAppointmentAvailability = async (req, res) => {
             return res.status(400).json({ available: false, message: "Servicio no especificado" });
         }
 
+        const appointmentDate = new Date(date);
+
         const existingAppointment = await prisma.appointment.findFirst({
             where: {
-                date: new Date(date),
-                type
-            },
+                type,
+                AND: [
+                    { date: { gte: new Date(appointmentDate.setSeconds(0, 0)) } },
+                    { date: { lt: new Date(appointmentDate.setSeconds(59, 999)) } }
+                ]
+            }
         });
 
         if (existingAppointment) {
