@@ -20,6 +20,8 @@ appointmentRouter.post('/',
     createAppointment
 );
 
+appointmentRouter.get('/getAvailableSlots',getAvailableSlots);
+
 appointmentRouter.put('/:id', updateAppointment);
 
 appointmentRouter.delete('/:id', deleteAppointment);
