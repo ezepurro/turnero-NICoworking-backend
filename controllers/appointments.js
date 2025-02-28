@@ -1,6 +1,7 @@
 import { response } from "express";
+import { addMinutes } from 'date-fns'
 import { PrismaClient } from "@prisma/client";
-import { findAvailableSlots,toMinutes } from "../helpers/appointmentHelpers";
+import { findAvailableSlots,toMinutes } from "../helpers/appointmentHelpers.js";
 const prisma = new PrismaClient();
 
 export const getAppointments = async ( req, res = response ) => {
@@ -246,7 +247,7 @@ export const getAvailableSlots = () => {
             const dateOnly = selectedDate.toISOString().split('T')[0];
     
             // Definir duración del turno según las zonas elegidas
-            const durationPerZone = 15; // Ejemplo: cada zona tarda 15 minutos
+            const durationPerZone = 5; // Ejemplo: cada zona tarda 15 minutos
             const sessionLength = parseInt(sessionZones) * durationPerZone;
     
             // Obtener turnos reservados en ese día
@@ -311,6 +312,49 @@ export const checkAppointmentAvailability = async (req, res) => {
     } catch (error) {
         console.error("Error verificando disponibilidad:", error);
         res.status(500).json({ available: false, message: "Error en el servidor" });
+    }
+};
+
+
+export const getReservedAppointments = async (req, res) => {
+    try {
+        const { date, duration } = req.query;
+        if (!date || !duration) {
+            return res.status(400).json({ msg: "Faltan parámetros (date y duration son requeridos)" });
+        }
+
+        const startOfDay = new Date(`${date}T00:00:00.000Z`);
+        const endOfDay = new Date(`${date}T23:59:59.999Z`);
+
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                }
+            },
+            select: {
+                date: true,
+                sessionLength: true,
+            }
+        });
+
+        let reservedTimes = [];
+        for (const appointment of appointments) {
+            let startTime = new Date(appointment.date);
+            let endTime = addMinutes(startTime, appointment.sessionLength || parseInt(duration));
+
+
+            while (startTime < endTime) {
+                reservedTimes.push(new Date(startTime)); 
+                startTime = addMinutes(startTime, 5);
+            }
+        }
+
+        return res.json({ reservedTimes });
+    } catch (error) {
+        console.error("Error obteniendo horarios ocupados:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
     }
 };
 

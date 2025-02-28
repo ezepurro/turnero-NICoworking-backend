@@ -2,7 +2,7 @@ import express from "express";
 const appointmentRouter = express.Router();
 import { check } from "express-validator";
 import { fieldValidator } from "../middlewares/field-validator.js";
-import { getAvailableSlots,getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
+import { getReservedAppointments,getAvailableSlots,getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
 
 
 appointmentRouter.get('/', getAppointments);
@@ -19,8 +19,9 @@ appointmentRouter.post('/',
     ], 
     createAppointment
 );
+appointmentRouter.get('/reserved',getReservedAppointments)
 
-appointmentRouter.get('/getAvailableSlots',getAvailableSlots);
+appointmentRouter.get('/getAvailableSlots', getAvailableSlots);
 
 appointmentRouter.put('/:id', updateAppointment);
 
