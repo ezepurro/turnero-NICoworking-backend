@@ -2,6 +2,7 @@ import { response } from "express";
 import { addMinutes } from 'date-fns'
 import { PrismaClient } from "@prisma/client";
 import { findAvailableSlots,toMinutes } from "../helpers/appointmentHelpers.js";
+
 const prisma = new PrismaClient();
 
 export const getAppointments = async ( req, res = response ) => {
@@ -296,11 +297,16 @@ export const checkAppointmentAvailability = async (req, res) => {
             return res.status(400).json({ available: false, message: "Servicio no especificado" });
         }
 
+        const appointmentDate = new Date(date);
+
         const existingAppointment = await prisma.appointment.findFirst({
             where: {
-                date: new Date(date),
-                type
-            },
+                type,
+                AND: [
+                    { date: { gte: new Date(appointmentDate.setSeconds(0, 0)) } },
+                    { date: { lt: new Date(appointmentDate.setSeconds(59, 999)) } }
+                ]
+            }
         });
 
         if (existingAppointment) {
@@ -314,6 +320,7 @@ export const checkAppointmentAvailability = async (req, res) => {
         res.status(500).json({ available: false, message: "Error en el servidor" });
     }
 };
+
 
 
 export const getReservedAppointments = async (req, res) => {
@@ -357,4 +364,5 @@ export const getReservedAppointments = async (req, res) => {
         return res.status(500).json({ msg: "Error interno del servidor" });
     }
 };
+
 

@@ -23,6 +23,8 @@ appointmentRouter.get('/reserved',getReservedAppointments)
 
 appointmentRouter.get('/getAvailableSlots', getAvailableSlots);
 
+appointmentRouter.get('/getAvailableSlots',getAvailableSlots);
+
 appointmentRouter.put('/:id', updateAppointment);
 
 appointmentRouter.delete('/:id', deleteAppointment);
