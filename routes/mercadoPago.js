@@ -55,6 +55,7 @@ mpRouter.post('/webhook', async (req, res) => {
             }
         });
         if (response.ok) {
+            
             const data = await response.json();
             if (data.status == 'approved') {
                 const appointmentId = data.external_reference;
