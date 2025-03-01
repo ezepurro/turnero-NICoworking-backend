@@ -1,6 +1,8 @@
 import { response } from "express";
+import { addMinutes } from 'date-fns'
 import { PrismaClient } from "@prisma/client";
-import { findAvailableSlots,toMinutes } from "../helpers/appointmentHelpers";
+import { findAvailableSlots,toMinutes } from "../helpers/appointmentHelpers.js";
+
 const prisma = new PrismaClient();
 
 export const getAppointments = async ( req, res = response ) => {
@@ -232,6 +234,57 @@ export const getAppointmentsPagination = async (req, res = response) => {
 };
 
 
+export const getAvailableSlots = () => {
+    async (req, res) => {
+        try {
+            const { date, sessionZones } = req.query;
+    
+            if (!date || !sessionZones) {
+                return res.status(400).json({ error: 'Faltan parámetros' });
+            }
+    
+            // Convertir date a un objeto Date y obtener la fecha en formato YYYY-MM-DD
+            const selectedDate = new Date(date);
+            const dateOnly = selectedDate.toISOString().split('T')[0];
+    
+            // Definir duración del turno según las zonas elegidas
+            const durationPerZone = 5; // Ejemplo: cada zona tarda 15 minutos
+            const sessionLength = parseInt(sessionZones) * durationPerZone;
+    
+            // Obtener turnos reservados en ese día
+            const appointments = await prisma.appointment.findMany({
+                where: {
+                    date: {
+                        gte: new Date(dateOnly + "T00:00:00.000Z"), 
+                        lt: new Date(dateOnly + "T23:59:59.999Z")
+                    }
+                }
+            });
+    
+            // Convertimos los turnos reservados a minutos desde medianoche
+            const bookedSlots = appointments.map(app => ({
+                start: toMinutes(app.date),
+                end: toMinutes(app.date) + (app.sessionLength || 0)
+            }));
+    
+            // Definir horario de atención (Ejemplo: 9:00 AM - 8:00 PM)
+            const openingTime = 9 * 60; // 9:00 AM en minutos
+            const closingTime = 20 * 60; // 8:00 PM en minutos
+    
+            // Encontrar espacios disponibles
+            const availableSlots = findAvailableSlots(openingTime, closingTime, bookedSlots, sessionLength);
+    
+            return res.json({ availableSlots });
+    
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    };
+    
+}
+
+
 export const checkAppointmentAvailability = async (req, res) => {
     try {
         const { date, type } = req.query;
@@ -269,53 +322,47 @@ export const checkAppointmentAvailability = async (req, res) => {
 };
 
 
-export const getAvailableSlots = () => {
-    async (req, res) => {
-        try {
-            const { date, sessionZones } = req.query;
-    
-            if (!date || !sessionZones) {
-                return res.status(400).json({ error: 'Faltan parámetros' });
-            }
-    
-            // Convertir date a un objeto Date y obtener la fecha en formato YYYY-MM-DD
-            const selectedDate = new Date(date);
-            const dateOnly = selectedDate.toISOString().split('T')[0];
-    
-            // Definir duración del turno según las zonas elegidas
-            const durationPerZone = 15; // Ejemplo: cada zona tarda 15 minutos
-            const sessionLength = parseInt(sessionZones) * durationPerZone;
-    
-            // Obtener turnos reservados en ese día
-            const appointments = await prisma.appointment.findMany({
-                where: {
-                    date: {
-                        gte: new Date(dateOnly + "T00:00:00.000Z"), 
-                        lt: new Date(dateOnly + "T23:59:59.999Z")
-                    }
-                }
-            });
-    
-            // Convertimos los turnos reservados a minutos desde medianoche
-            const bookedSlots = appointments.map(app => ({
-                start: toMinutes(app.date),
-                end: toMinutes(app.date) + (app.sessionLength || 0)
-            }));
-    
-            // Definir horario de atención (Ejemplo: 9:00 AM - 8:00 PM)
-            const openingTime = 9 * 60; // 9:00 AM en minutos
-            const closingTime = 20 * 60; // 8:00 PM en minutos
-    
-            // Encontrar espacios disponibles
-            const availableSlots = findAvailableSlots(openingTime, closingTime, bookedSlots, sessionLength);
-    
-            return res.json({ availableSlots });
-    
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ error: 'Error interno del servidor' });
+
+export const getReservedAppointments = async (req, res) => {
+    try {
+        const { date, duration } = req.query;
+        if (!date || !duration) {
+            return res.status(400).json({ msg: "Faltan parámetros (date y duration son requeridos)" });
         }
-    };
-    
-}
+
+        const startOfDay = new Date(`${date}T00:00:00.000Z`);
+        const endOfDay = new Date(`${date}T23:59:59.999Z`);
+
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                }
+            },
+            select: {
+                date: true,
+                sessionLength: true,
+            }
+        });
+
+        let reservedTimes = [];
+        for (const appointment of appointments) {
+            let startTime = new Date(appointment.date);
+            let endTime = addMinutes(startTime, appointment.sessionLength || parseInt(duration));
+
+
+            while (startTime < endTime) {
+                reservedTimes.push(new Date(startTime)); 
+                startTime = addMinutes(startTime, 5);
+            }
+        }
+
+        return res.json({ reservedTimes });
+    } catch (error) {
+        console.error("Error obteniendo horarios ocupados:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
 
