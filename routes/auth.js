@@ -1,9 +1,11 @@
 import express from "express";
-const authRouter = express.Router();
 import { check } from "express-validator";
 import { fieldValidator } from "../middlewares/field-validator.js";
 import { JSWValidator } from "../middlewares/jwt-validator.js";
-import { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } from "../controllers/auth.js";
+import { isAdmin } from "../middlewares/is-admin.js";
+import { checkUserAccess } from "../middlewares/check-user-access.js";
+import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } from "../controllers/auth.js";
+const authRouter = express.Router();
 
 
 authRouter.post('/register', 
@@ -25,13 +27,35 @@ authRouter.post('/login',
     loginUser
 );
 
-authRouter.get('/users', getAllUsers);
+authRouter.post('/logout', logoutUser);
 
-authRouter.get('/users/:id', getUserById);
+authRouter.get('/users', 
+    [
+        JSWValidator, isAdmin
+    ], 
+    getAllUsers
+);
 
-authRouter.put('/users/:id', updateUserById);
+authRouter.get('/users/:id',
+    [
+        JSWValidator, checkUserAccess
+    ], 
+    getUserById
+);
 
-authRouter.delete('/users/:id', deleteUserById);
+authRouter.put('/users/:id',
+    [
+        JSWValidator, isAdmin
+    ],
+    updateUserById
+);
+
+authRouter.delete('/users/:id', 
+    [
+        JSWValidator, isAdmin
+    ], 
+    deleteUserById
+);
 
 authRouter.get('/renew', JSWValidator, renewToken);
 

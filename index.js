@@ -1,5 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs'; 
+import https from 'https';
+import cookieParser from 'cookie-parser';
 import config from "./config.js";
 import appointmentRouter from './routes/appointments.js';
 import authRouter from './routes/auth.js';
@@ -10,7 +13,13 @@ import mpRouter from './routes/mercadoPago.js';
 const app = express();
 
 // Cors
-app.use(cors());
+app.use(cors({
+    origin: config.FRONTEND_BASE_URL,
+    credentials: true
+}));
+
+// Middleware para parsear cookies
+app.use(cookieParser());
 
 // Lecutra y parseo del body
 app.use(express.json());
@@ -21,8 +30,20 @@ app.use('/api/appointments', appointmentRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/mercadopago', mpRouter);
 
-// Escuchar peticiones
-app.listen(process.env.PORT, async () => {
-    console.log(`Servidor corriendo en puerto ${config.PORT}`);
+// Leer los archivos del certificado y la clave privada
+const options = {
+    key: fs.readFileSync('localhost-key.pem'),
+    cert: fs.readFileSync('localhost.pem')
+};
+
+// // Escuchar peticiones
+// app.listen(process.env.PORT, async () => {
+//     console.log(`Servidor corriendo en puerto ${config.PORT}`);
+//     await import("./cronJob/cronJob.js");
+// });
+
+// Crear el servidor HTTPS
+https.createServer(options, app).listen(config.PORT, async () => {
+    console.log(`Servidor HTTPS corriendo en puerto ${config.PORT}`);
     await import("./cronJob/cronJob.js");
 });

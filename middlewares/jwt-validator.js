@@ -5,7 +5,8 @@ import config from "../config.js";
 
 export const JSWValidator = ( req, res = response, next ) => {
 
-    const token = req.header('x-token');
+    const token = req.cookies.token;
+
     if ( !token ) {
         return res.status(401).json({
             ok: false,
@@ -26,5 +27,3 @@ export const JSWValidator = ( req, res = response, next ) => {
 
     next();
 }
-
-

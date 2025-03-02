@@ -5,88 +5,86 @@ import { generateJWT } from "../helpers/jwt.js";
 
 const prisma = new PrismaClient();
 
-export const registerUser = async ( req, res = response ) => {
-
+export const registerUser = async (req, res = response) => {
     const { name, email, password, contact } = req.body;
 
     try {
-        // Verifico si existe un usuario con el mismo email en la db
-        const existingUser = await prisma.user.findUnique({ where: { email: email } });
-        if ( existingUser ) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Ya existe un usuario con ese email'
-            });
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ ok: false, msg: 'Ya existe un usuario con ese email' });
         }
 
-        // Encripto la contraseña
         const salt = bcrypt.genSaltSync();
-        const encryptedPassword = bcrypt.hashSync( password, salt );
-
-        // Y lo guardo en la db
+        const encryptedPassword = bcrypt.hashSync(password, salt);
         const user = await prisma.user.create({ data: { name, email, password: encryptedPassword, contact } });
 
-        // Genero el JWT
-        const token = await generateJWT( user.id, user.name );
+        const token = await generateJWT(user.id, user.name, user.isAdmin);
 
-        // Retorno el estado y el token
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true,  
+            sameSite: 'None', 
+            maxAge: 24 * 60 * 60 * 1000 
+        });
+
         res.status(201).json({
             ok: true,
             uid: user.id,
             name: user.name,
-	        isAdmin: user.isAdmin,
-            token
+            isAdmin: user.isAdmin
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'No se ha podido completar el registro'
-        });
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'No se ha podido completar el registro' });
     }
-}
+};
 
-export const loginUser = async ( req, res = response ) => {
-
+export const loginUser = async (req, res = response) => {
     const { email, password } = req.body;
 
     try {
-        // Verifico si existe un usuario con el mail registrado
-        const user = await prisma.user.findUnique({ where: { email: email } });
-        if ( !user ) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'No se ha encontrado usuario con ese email registrado'
-            })
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            return res.status(400).json({ ok: false, msg: 'Usuario no encontrado' });
         }
 
-        // Confirmo si coinciden las contraseñas
-        const validPassword = bcrypt.compareSync( password, user.password );
-        if ( !validPassword ) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Contraseña incorrecta'
-            })
+        const validPassword = bcrypt.compareSync(password, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ ok: false, msg: 'Contraseña incorrecta' });
         }
 
-        // Genero el JWT
-        const token = await generateJWT( user.id, user.name );
+        const token = await generateJWT(user.id, user.name, user.isAdmin);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true, 
+            sameSite: 'None', 
+            maxAge: 24 * 60 * 60 * 1000
+        });
 
         res.json({
             ok: true,
             uid: user.id,
             name: user.name,
-	        isAdmin: user.isAdmin,
-            token
+            isAdmin: user.isAdmin
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'No se ha podido completar el inicio de sesión'
-        });
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'No se ha podido completar el inicio de sesión' });
     }
-}
+};
+
+
+export const logoutUser = (req, res = response) => {
+    res.cookie('token', '', {
+        httpOnly: true, 
+        secure: true, 
+        sameSite: 'None', 
+        expires: new Date(0) 
+    });
+    res.json({ ok: true, msg: 'Sesión cerrada' });
+};
+
 
 export const getAllUsers = async ( req, res = response ) => {
     try {
