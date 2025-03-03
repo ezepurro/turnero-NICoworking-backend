@@ -85,7 +85,7 @@ export const getUserAppointments = async ( req, res = response ) => {
 
 export const updateAppointment = async ( req, res = response ) => {
     const id = req.params.id;
-    const { userId, date, time, sessionLength, sessionZones, contact, type, status } = req.body;
+    const { userId, date, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
         // Verifico que existe el usuario
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -111,7 +111,6 @@ export const updateAppointment = async ( req, res = response ) => {
             data: {
                 clientId: userId,
                 date,
-                time,
                 sessionLength,
                 sessionZones,
                 contact,

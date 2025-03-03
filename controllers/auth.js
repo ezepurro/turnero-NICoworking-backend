@@ -24,7 +24,7 @@ export const registerUser = async (req, res = response) => {
             httpOnly: true,
             secure: true,  
             sameSite: 'None', 
-            maxAge: 24 * 60 * 60 * 1000 
+            maxAge: 60 * 60 * 1000 
         });
 
         res.status(201).json({
@@ -59,7 +59,7 @@ export const loginUser = async (req, res = response) => {
             httpOnly: true,
             secure: true, 
             sameSite: 'None', 
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 60 * 60 * 1000
         });
 
         res.json({
@@ -175,11 +175,35 @@ export const deleteUserById = async ( req, res = response ) => {
 
 
 export const renewToken = async (req, res = response) => {
-    const { uid, name } = req;
-    const token = await generateJWT( uid, name );
-    res.json({
-        ok: true,
-        token
-    });
-}
+    try {
+        const user = await prisma.user.findUnique({ where: { id: req.uid } });
 
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no encontrado'
+            });
+        }
+
+        const token = await generateJWT(user.id, user.name, user.isAdmin);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None',
+            maxAge: 60 * 60 * 1000 // * 24
+        });
+        res.json({
+            ok: true,
+            uid: user.id,
+            name: user.name,
+            isAdmin: user.isAdmin,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se pudo renovar el token'
+        });
+    }
+};
