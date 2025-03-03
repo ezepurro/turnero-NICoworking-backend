@@ -4,7 +4,7 @@ import config from "../config.js";
 const WHATSAPP_API_URL = `https://graph.facebook.com/v21.0/${config.WHATSAPP_NUMBER}/messages`;
 const ACCESS_TOKEN = config.WHATSAPP_ACCESS_TOKEN;
 
-const sendWhatsAppMessage = async (phoneNumber, messageData) => {
+const sendWhatsAppMessage = async (template_name, phoneNumber, messageData) => {
     try {
         const response = await axios.post(
             WHATSAPP_API_URL,
@@ -13,7 +13,7 @@ const sendWhatsAppMessage = async (phoneNumber, messageData) => {
                 to: phoneNumber,
                 type: "template",
                 template: {
-                    name: "recordatorio_turno",
+                    name: template_name,
                     language: { code: "es_AR" },
                     components: [
                         {

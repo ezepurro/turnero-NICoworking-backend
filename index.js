@@ -8,6 +8,7 @@ import appointmentRouter from './routes/appointments.js';
 import authRouter from './routes/auth.js';
 import settingsRouter from './routes/settings.js';
 import mpRouter from './routes/mercadoPago.js';
+import whatsappRouter from './routes/whatsapp.js';
 
 // Crear el servidor de express
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/mercadopago', mpRouter);
+app.use('/api/whatsapp', whatsappRouter);
 
 // Leer los archivos del certificado y la clave privada
 const options = {
