@@ -4,7 +4,7 @@ import { fieldValidator } from "../middlewares/field-validator.js";
 import { JSWValidator } from "../middlewares/jwt-validator.js";
 import { checkUserAccess } from "../middlewares/check-user-access.js";
 import { isAdmin } from "../middlewares/is-admin.js";
-import { getReservedAppointments,getAvailableSlots,getAppointments, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getWaxAppointments, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
+import { getReservedAppointments, getAvailableSlots, getAppointments, getAppointmentsByService, createAppointment, getUserAppointments, updateAppointment, deleteAppointment, getAppointmentsPagination, checkAppointmentAvailability } from "../controllers/appointments.js";
 const appointmentRouter = express.Router();
 
 
@@ -15,12 +15,13 @@ appointmentRouter.get('/',
     getAppointments
 );
 
-appointmentRouter.get('/waxing',
+appointmentRouter.post('/service', 
     [
         JSWValidator, isAdmin
-    ],  
-    getWaxAppointments
+    ], 
+    getAppointmentsByService
 );
+
 
 appointmentRouter.get('/users/:id', 
     [

@@ -5,21 +5,64 @@ import { findAvailableSlots, toMinutes } from "../helpers/appointmentHelpers.js"
 
 const prisma = new PrismaClient();
 
-export const getAppointments = async ( req, res = response ) => {
+export const getAppointments = async (req, res) => {
     try {
-        const appointments = await prisma.appointment.findMany();
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                date: {
+                    gt: now
+                }
+            }
+        });
         res.json({
             ok: true,
             appointments
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se ha podido completar la petición'
         });
     }
-}
+};
+
+export const getAppointmentsByService = async (req, res) => {
+    try {
+        const { type } = req.body;
+        if (!type) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'El tipo de servicio es requerido'
+            });
+        }
+
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                type: type,
+                date: {
+                    gt: now
+                }
+            }
+        });
+
+        res.json({
+            ok: true,
+            appointments
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+};
+
 
 export const createAppointment = async ( req, res = response ) => {
     const { userId, date, time, sessionLength, sessionZones, contact, type, status } = req.body;
