@@ -13,6 +13,9 @@ export const getAppointments = async (req, res) => {
             where: {
                 date: {
                     gt: now
+                },
+                status: {
+                    in: ["pending", "paid"]
                 }
             }
         });
@@ -259,6 +262,44 @@ export const getAppointmentsPagination = async (req, res = response) => {
     }
 };
 
+export const getAppointmentsNoPaidPagination = async (req, res = response) => {
+    try {
+        // ?page=1&limit=10
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10;  
+
+        const skip = (page - 1) * limit;  
+
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                status: 'no-paid'
+            },
+            skip,
+            take: limit,
+        });
+
+        const totalAppointments = await prisma.appointment.count({
+            where: {
+                status: 'no-paid'
+            }
+        });
+
+        res.json({
+            ok: true,
+            appointments,
+            totalPages: Math.ceil(totalAppointments / limit),
+            currentPage: page,
+            totalAppointments
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+}
+
 
 export const checkAppointmentAvailability = async (req, res) => {
     try {
@@ -359,6 +400,9 @@ export const getReservedAppointments = async (req, res) => {
                 date: {
                     gte: startOfDay,
                     lte: endOfDay,
+                },
+                status: {
+                    in: ["pending", "paid"]
                 }
             },
             select: {

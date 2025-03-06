@@ -20,7 +20,7 @@ const sendWhatsAppMessage = async (template_name, phoneNumber, messageData) => {
                             type: "body",
                             parameters: [
                                 { type: "text", text: messageData.name },  // {{1}} Nombre del cliente
-                                { type: "text", text: messageData.type },  // {{2}} Tipo de servicio
+                                { type: "text", text: messageData.type.toLocaleLowerCase() },  // {{2}} Tipo de servicio
                                 { type: "text", text: messageData.date },  // {{3}} Fecha del turno
                                 { type: "text", text: messageData.time }   // {{4}} Hora del turno
                             ]
