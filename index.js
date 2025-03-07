@@ -33,19 +33,19 @@ app.use('/api/mercadopago', mpRouter);
 app.use('/api/whatsapp', whatsappRouter);
 
 // Leer los archivos del certificado y la clave privada
-const options = {
-    key: fs.readFileSync('localhost-key.pem'),
-    cert: fs.readFileSync('localhost.pem')
-};
+// const options = {
+//     key: fs.readFileSync('localhost-key.pem'),
+//     cert: fs.readFileSync('localhost.pem')
+// };
 
-// // Escuchar peticiones
-// app.listen(process.env.PORT, async () => {
-//     console.log(`Servidor corriendo en puerto ${config.PORT}`);
-//     await import("./cronJob/cronJob.js");
-// });
-
-// Crear el servidor HTTPS
-https.createServer(options, app).listen(config.PORT, async () => {
-    console.log(`Servidor HTTPS corriendo en puerto ${config.PORT}`);
+// Escuchar peticiones
+app.listen(process.env.PORT, async () => {
+    console.log(`Servidor corriendo en puerto ${config.PORT}`);
     await import("./cronJob/cronJob.js");
 });
+
+// // Crear el servidor HTTPS
+// https.createServer(options, app).listen(config.PORT, async () => {
+//     console.log(`Servidor HTTPS corriendo en puerto ${config.PORT}`);
+//     await import("./cronJob/cronJob.js");
+// });
