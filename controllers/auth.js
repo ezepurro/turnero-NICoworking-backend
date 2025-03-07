@@ -20,18 +20,12 @@ export const registerUser = async (req, res = response) => {
 
         const token = await generateJWT(user.id, user.name, user.isAdmin);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,  
-            sameSite: 'None', 
-            maxAge: 60 * 60 * 1000 
-        });
-
         res.status(201).json({
             ok: true,
             uid: user.id,
             name: user.name,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin,
+            token
         });
     } catch (error) {
         console.error(error);
@@ -55,18 +49,12 @@ export const loginUser = async (req, res = response) => {
 
         const token = await generateJWT(user.id, user.name, user.isAdmin);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true, 
-            sameSite: 'None', 
-            maxAge: 60 * 60 * 1000
-        });
-
         res.json({
             ok: true,
             uid: user.id,
             name: user.name,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin,
+            token
         });
     } catch (error) {
         console.error(error);
@@ -74,16 +62,6 @@ export const loginUser = async (req, res = response) => {
     }
 };
 
-
-export const logoutUser = (req, res = response) => {
-    res.cookie('token', '', {
-        httpOnly: true, 
-        secure: true, 
-        sameSite: 'None', 
-        expires: new Date(0) 
-    });
-    res.json({ ok: true, msg: 'Sesión cerrada' });
-};
 
 
 export const getAllUsers = async ( req, res = response ) => {
@@ -187,17 +165,12 @@ export const renewToken = async (req, res = response) => {
 
         const token = await generateJWT(user.id, user.name, user.isAdmin);
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 60 * 60 * 1000 // * 24
-        });
         res.json({
             ok: true,
             uid: user.id,
             name: user.name,
             isAdmin: user.isAdmin,
+            token
         });
     } catch (error) {
         console.error(error);

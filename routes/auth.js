@@ -4,7 +4,7 @@ import { fieldValidator } from "../middlewares/field-validator.js";
 import { JSWValidator } from "../middlewares/jwt-validator.js";
 import { isAdmin } from "../middlewares/is-admin.js";
 import { checkUserAccess } from "../middlewares/check-user-access.js";
-import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } from "../controllers/auth.js";
+import { registerUser, loginUser, getAllUsers, getUserById, updateUserById, deleteUserById, renewToken } from "../controllers/auth.js";
 const authRouter = express.Router();
 
 
@@ -26,8 +26,6 @@ authRouter.post('/login',
     ], 
     loginUser
 );
-
-authRouter.post('/logout', logoutUser);
 
 authRouter.get('/users', 
     [
