@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "npm run prisma:generate && node index.js",
-    "prisma:generate": "prisma generate",
-    "postinstall": "npm install && npm run prisma:generate"
+    "start": "npx prisma generate && node index.js",
+    "postinstall": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
