@@ -318,6 +318,7 @@ export const checkAppointmentAvailability = async (req, res) => {
         const existingAppointment = await prisma.appointment.findFirst({
             where: {
                 type,
+                status: { in: ["paid", "pending"] },
                 AND: [
                     { date: { gte: new Date(appointmentDate.setSeconds(0, 0)) } },
                     { date: { lt: new Date(appointmentDate.setSeconds(59, 999)) } }
@@ -326,6 +327,7 @@ export const checkAppointmentAvailability = async (req, res) => {
         });
 
         if (existingAppointment) {
+            console.log(existingAppointment);
             return res.json({ available: false });
         }
 
