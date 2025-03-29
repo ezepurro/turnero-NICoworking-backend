@@ -15,7 +15,7 @@ export const createPreference = async (req, res) => {
         const body = {
             items: [{
                 title: title,
-                description: `Fecha: ${schedule}`,
+                description: `Beauty Bloom - Seña Depilación Definitiva`,
                 quantity: 1, 
                 unit_price: Number(price), 
                 currency_id: "ARS",
