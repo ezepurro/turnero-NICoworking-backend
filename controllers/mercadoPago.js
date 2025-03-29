@@ -23,8 +23,8 @@ export const createPreference = async (req, res) => {
             }],
             back_urls: {
                 success: `${config.FRONTEND_BASE_URL}appointments`,
-                failure: `${config.FRONTEND_BASE_URL}/`,
-                pending: `${config.FRONTEND_BASE_URL}/`,
+                failure: `${config.FRONTEND_BASE_URL}`,
+                pending: `${config.FRONTEND_BASE_URL}`,
             },
             auto_return: 'approved',
             notification_url: config.NGROK_WEBHOOK_URL,
@@ -32,6 +32,8 @@ export const createPreference = async (req, res) => {
 
         };
 
+        console.log("Preference Body:", body);
+        
         const preference = new Preference(client);
         const result = await preference.create({ body });
         res.json({ id: result.id });
