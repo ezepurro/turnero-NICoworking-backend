@@ -12,18 +12,19 @@ export const createPreference = async (req, res) => {
     try {
         const { price, schedule, zonesAmmount, appointmentId } = req.body;
         const title = (zonesAmmount === 'Full-Body') ? 'Reserva de turno - Full-Body' : `Reserva de turno - ${zonesAmmount} zonas`;
+        console.log("SuccessUrl: ", `${config.FRONTEND_BASE_URL}/appointments`)
         const body = {
             items: [{
                 title: title,
-                description: `Fecha: ${schedule}`,
+                description: `Beauty Bloom - Seña Depilación Definitiva`,
                 quantity: 1, 
                 unit_price: Number(price), 
                 currency_id: "ARS",
             }],
             back_urls: {
-                success: `${config.FRONTEND_BASE_URL}/appointments`,
-                failure: `${config.FRONTEND_BASE_URL}/`,
-                pending: `${config.FRONTEND_BASE_URL}/`,
+                success: `${config.FRONTEND_BASE_URL}appointments`,
+                failure: `${config.FRONTEND_BASE_URL}`,
+                pending: `${config.FRONTEND_BASE_URL}`,
             },
             auto_return: 'approved',
             notification_url: config.NGROK_WEBHOOK_URL,
@@ -31,6 +32,8 @@ export const createPreference = async (req, res) => {
 
         };
 
+        console.log("Preference Body:", body);
+        
         const preference = new Preference(client);
         const result = await preference.create({ body });
         res.json({ id: result.id });

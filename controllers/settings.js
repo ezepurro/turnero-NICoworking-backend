@@ -4,12 +4,12 @@ import config from "../config.js";
 
 const prisma = new PrismaClient();
 
-export const getCalendarSettings = async ( req, res = response ) => {
+export const getDates = async ( req, res = response ) => {
     try {
-        const calendarSettings = await prisma.calendarSettings.findFirst();
+        const dates = await prisma.date.findFirst()
         res.json({
             ok: true,
-            calendarSettings
+            dates
         });
     } catch (error) {
         console.log(error);
@@ -20,44 +20,28 @@ export const getCalendarSettings = async ( req, res = response ) => {
     }
 }
 
-export const addDatesToCalendarSettings = async ( req, res = response ) => {
-    const { newDates } = req.body;
-    const id = config.CALENDARID;
+export const addDate = async ( req, res = response ) => {
+    const { newDateAvailable} = req.body;
     try {
-        if (!id) {
-            return res.status(500).json({
-                ok: false,
-                msg: "No se ha configurado el ID de calendario en las variables de entorno"
-            });
-        }
 
-        // Obtengo las configuraciones del calendario
-        const calendar = await prisma.calendarSettings.findUnique({
-            where: { id },
+        const date = await prisma.date.findUnique({
+            where: { date },
         });
-        if (!calendar) {
+        if (date) {
             return res.status(404).json({
                 ok: false,
-                msg: 'No se han encontrado las configuraciones del calendario'
+                msg: 'Esta fecha ya esta habilitada'
             });
+        } else {
+            date = await prisma.date.create({
+                date: newDateAvailable.date,
+                starTime: newDateAvailable.date,
+                endTime: newDateAvailable.endTime
+            })
         }
-
-        // Agrego las nuevas fechas
-        const updatedDates = [...calendar.waxDays, ...newDates];
-
-        // Ordeno las fechas por orden cronológico (ascendente)
-        updatedDates.sort((a, b) => new Date(a) - new Date(b));
-
-        const updatedCalendar = await prisma.calendarSettings.update({
-            where: { id },
-            data: {
-                waxDays: updatedDates,
-            },
-        });
-
         res.json({
             ok: true,
-            settings: updatedCalendar
+            date
         });
     } catch (error) {
         console.log(error);
@@ -69,26 +53,17 @@ export const addDatesToCalendarSettings = async ( req, res = response ) => {
 }
 
 
-export const removeDateFromCalendarSettings = async (req, res) => {
-    const { date } = req.query;
-    const calendarId = config.CALENDARID;
+export const removeDate = async (req, res) => {
+    const { dateToRemove } = req.query;
 
     try {
-        if (!date) {
+        if (!dateToRemove) {
             return res.status(400).json({
                 ok: false,
                 msg: "Se requiere el parámetro 'date'"
             });
         }
-
-        if (!calendarId) {
-            return res.status(500).json({
-                ok: false,
-                msg: "No se ha configurado el ID de calendario en las variables de entorno"
-            });
-        }
-
-        const decodedDate = decodeURIComponent(date);
+        const decodedDate = decodeURIComponent(dateToRemove);
         const parsedDate = new Date(decodedDate);
 
         if (isNaN(parsedDate.getTime())) {
@@ -99,33 +74,16 @@ export const removeDateFromCalendarSettings = async (req, res) => {
         }
 
         // Buscar el calendario en la base de datos
-        const calendar = await prisma.calendarSettings.findUnique({
-            where: { id: calendarId }
+        const date = await prisma.date.delete({
+            where: { date: dateToRemove.date }
         });
 
-        if (!calendar) {
+        if (!date) {
             return res.status(404).json({
                 ok: false,
-                msg: "No se encontraron configuraciones del calendario"
+                msg: "No se encontro la fecha deseada"
             });
         }
-
-        const targetTimestamp = parsedDate.getTime();
-        const updatedWaxDays = calendar.waxDays.filter(d => new Date(d).getTime() !== targetTimestamp);
-
-        // Si la fecha no estaba en el array, devolver un error
-        if (updatedWaxDays.length === calendar.waxDays.length) {
-            return res.status(404).json({
-                ok: false,
-                msg: "Fecha no encontrada en waxDays"
-            });
-        }
-
-        // Actualizar el documento con el nuevo array de fechas
-        await prisma.calendarSettings.update({
-            where: { id: calendarId },
-            data: { waxDays: updatedWaxDays }
-        });
 
         res.status(200).json({
             ok: true,

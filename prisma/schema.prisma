@@ -50,8 +50,9 @@ model Appointment {
   sessionLength Int?
   contact       String
   status        String
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime @default(now()) 
 }
+
 
 model BusinessSettings {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -62,4 +63,11 @@ model BusinessSettings {
   adminsAmount        Int?
   employeesAmount     Int?
   servicesAmount      Int?
+}
+
+model Date {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  date String
+  starTime String
+  endTime String
 }
