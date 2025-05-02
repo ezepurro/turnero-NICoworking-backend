@@ -7,6 +7,7 @@ import config from "./config.js";
 import appointmentRouter from './routes/appointments.js';
 import authRouter from './routes/auth.js';
 import settingsRouter from './routes/settings.js';
+import servicesRouter from './routes/services.js';
 import mpRouter from './routes/mercadoPago.js';
 import whatsappRouter from './routes/whatsapp.js';
 
@@ -27,6 +28,7 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/auth', authRouter);
+app.use('/api/services', servicesRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/mercadopago', mpRouter);
