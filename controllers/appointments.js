@@ -67,7 +67,7 @@ export const getAppointmentsByService = async (req, res) => {
 };
 
 
-export const createAppointment = async ( req, res = response ) => {
+export const createAppointment = async (req, res = response) => {
     const { userId, date, time, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
         // Verifico que existe el usuario
@@ -105,7 +105,7 @@ export const createAppointment = async ( req, res = response ) => {
     }
 }
 
-export const getUserAppointments = async ( req, res = response ) => {
+export const getUserAppointments = async (req, res = response) => {
     const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -129,7 +129,7 @@ export const getUserAppointments = async ( req, res = response ) => {
     }
 }
 
-export const updateAppointment = async ( req, res = response ) => {
+export const updateAppointment = async (req, res = response) => {
     const id = req.params.id;
     const { userId, date, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
@@ -177,7 +177,7 @@ export const updateAppointment = async ( req, res = response ) => {
     }
 }
 
-export const deleteAppointment = async ( req, res = response ) => {
+export const deleteAppointment = async (req, res = response) => {
     const id = req.params.id;
     try {
         // Verifico que existe la cita
@@ -208,12 +208,12 @@ export const deleteAppointment = async ( req, res = response ) => {
 // Trae solo las fechas futuras
 export const getWaxAppointments = async (req, res = response) => {
     try {
-        const currentDate = new Date(); 
+        const currentDate = new Date();
         const waxAppointments = await prisma.appointment.findMany({
             where: {
                 type: 'Depilación',
                 date: {
-                    gt: currentDate 
+                    gt: currentDate
                 }
             }
         });
@@ -234,10 +234,10 @@ export const getWaxAppointments = async (req, res = response) => {
 export const getAppointmentsPagination = async (req, res = response) => {
     try {
         // ?page=1&limit=10
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 10;  
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
-        const skip = (page - 1) * limit;  
+        const skip = (page - 1) * limit;
 
         const appointments = await prisma.appointment.findMany({
             skip,
@@ -265,10 +265,10 @@ export const getAppointmentsPagination = async (req, res = response) => {
 export const getAppointmentsNoPaidPagination = async (req, res = response) => {
     try {
         // ?page=1&limit=10
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 10;  
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
-        const skip = (page - 1) * limit;  
+        const skip = (page - 1) * limit;
 
         const appointments = await prisma.appointment.findMany({
             where: {
@@ -344,46 +344,46 @@ export const getAvailableSlots = () => {
     async (req, res) => {
         try {
             const { date, sessionZones } = req.query;
-    
+
             if (!date || !sessionZones) {
                 return res.status(400).json({ error: 'Faltan parámetros' });
             }
-    
+
             const selectedDate = new Date(date);
             const dateOnly = selectedDate.toISOString().split('T')[0];
-            const durationPerZone = 5; 
+            const durationPerZone = 5;
             const sessionLength = parseInt(sessionZones) * durationPerZone;
-    
+
             // Obtener turnos reservados en ese día
             const appointments = await prisma.appointment.findMany({
                 where: {
                     date: {
-                        gte: new Date(dateOnly + "T00:00:00.000Z"), 
+                        gte: new Date(dateOnly + "T00:00:00.000Z"),
                         lt: new Date(dateOnly + "T23:59:59.999Z")
                     }
                 }
             });
-    
+
             // Convertimos los turnos reservados a minutos desde medianoche
             const bookedSlots = appointments.map(app => ({
                 start: toMinutes(app.date),
                 end: toMinutes(app.date) + (app.sessionLength || 0)
             }));
-    
+
             // Horario de atención (9:00 AM - 8:00 PM)
-            const openingTime = 9 * 60; 
+            const openingTime = 9 * 60;
             const closingTime = 20 * 60;
-    
+
             // Encontrar espacios disponibles
             const availableSlots = findAvailableSlots(openingTime, closingTime, bookedSlots, sessionLength);
-    
+
             return res.json({ availableSlots });
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'Error interno del servidor' });
         }
     };
-    
+
 }
 
 
@@ -420,7 +420,7 @@ export const getReservedAppointments = async (req, res) => {
 
 
             while (startTime < endTime) {
-                reservedTimes.push(new Date(startTime)); 
+                reservedTimes.push(new Date(startTime));
                 startTime = addMinutes(startTime, 5);
             }
         }
@@ -429,5 +429,58 @@ export const getReservedAppointments = async (req, res) => {
     } catch (error) {
         console.error("Error obteniendo horarios ocupados:", error);
         return res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+
+export const createAppointmentByAdmin = async (req, res = response) => {
+    const {
+        userId,
+        date,
+        sessionLength,
+        sessionZones,
+        contact,
+        type,
+        status,
+        extraName,
+        extraContact,
+        extraData,
+    } = req.body;
+
+    try {
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                msg: "Usuario no encontrado",
+            });
+        }
+
+        const appointment = await prisma.appointment.create({
+            data: {
+                client: { connect: { id: user.id } },
+                date,
+                sessionLength,
+                sessionZones,
+                contact,
+                type,
+                status,
+                extraName,
+                extraContact,
+                extraData,
+            },
+        });
+
+        res.json({
+            ok: true,
+            appointment,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: "No se ha podido completar la petición",
+        });
     }
 };
