@@ -35,7 +35,7 @@ export const addDate = async ( req, res = response ) => {
         } else {
             date = await prisma.date.create({
                 date: newDateAvailable.date,
-                starTime: newDateAvailable.date,
+                starTime: newDateAvailable.starTime,
                 endTime: newDateAvailable.endTime
             })
         }
@@ -51,6 +51,63 @@ export const addDate = async ( req, res = response ) => {
         });
     }
 }
+
+export const changeDateTime = async (req, res) => {
+    try {
+        const { dateId, newStartTime, newEndTime } = req.body;
+
+        if (!newStartTime && !newEndTime) {
+            return res.json({
+                msg: 'No existen modificaciones en el tiempo'
+            });
+        }
+    
+        try {
+            const foundedDate = await prisma.date.findUnique({
+                where: {
+                    id: dateId
+                }
+            });
+    
+            if (!foundedDate) {
+                return res.status(404).json({
+                    ok: false,
+                    msg: 'No se ha encontrado la fecha a modificar'
+                });
+            }
+    
+            const updatedDate = await prisma.date.update({
+                where: {
+                    id: dateId
+                },
+                data: {
+                    ...(newStartTime && { startTime: newStartTime }),
+                    ...(newEndTime && { endTime: newEndTime }),
+                }
+            });
+    
+            res.json({
+                ok: true,
+                msg: 'Fecha modificada con éxito',
+                updatedDate
+            });
+    
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                ok: false,
+                msg: 'Error al modificar la fecha'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'No se ha podido completar la petición'
+        });
+    }
+};
+
 
 
 export const removeDate = async (req, res) => {
