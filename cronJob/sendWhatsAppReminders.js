@@ -18,13 +18,14 @@ cron.schedule("0 9 * * *", async () => {
         });
 
         for (const appointment of appointments) {
+            const phoneNumber = appointment.extraContact || appointment.contact;
             const messageData = {
                 name: appointment.client.name,
                 type: appointment.type,
                 date: moment(appointment.date).format("DD/MM/YYYY"),
                 time: moment(appointment.date).format("HH:mm"),
             };
-            await sendWhatsAppMessage("recordatorio_turno", formatPhoneNumber(appointment.contact), messageData);
+            await sendWhatsAppMessage("recordatorio_turno", formatPhoneNumber(phoneNumber), messageData);
         }
 
         console.log("Recordatorios enviados");
