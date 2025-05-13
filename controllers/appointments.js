@@ -326,6 +326,7 @@ export const checkAppointmentAvailability = async (req, res) => {
             }
         });
 
+        
         if (existingAppointment) {
             console.log(existingAppointment);
             return res.json({ available: false });
