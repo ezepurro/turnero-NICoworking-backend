@@ -20,29 +20,34 @@ export const getDates = async ( req, res = response ) => {
     }
 }
 
-export const addDate = async ( req, res = response ) => {
-    const { newDateAvailable} = req.body;
-    try {
+export const addDate = async (req, res = response) => {
+    const { newDateAvailable } = req.body;
 
-        const date = await prisma.date.findUnique({
-            where: { date },
+    try {
+        const existingDate = await prisma.date.findUnique({
+            where: { date: newDateAvailable.date },
         });
-        if (date) {
+
+        if (existingDate) {
             return res.status(404).json({
                 ok: false,
-                msg: 'Esta fecha ya esta habilitada'
+                msg: 'Esta fecha ya está habilitada'
             });
-        } else {
-            date = await prisma.date.create({
-                date: newDateAvailable.date,
-                starTime: newDateAvailable.starTime,
-                endTime: newDateAvailable.endTime
-            })
         }
+
+        const date = await prisma.date.create({
+            data: {
+                date: new Date(newDateAvailable.date),
+                startTime: new Date(newDateAvailable.startTime),
+                endTime: new Date(newDateAvailable.endTime)
+            }
+        });
+
         res.json({
             ok: true,
             date
         });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -50,7 +55,8 @@ export const addDate = async ( req, res = response ) => {
             msg: 'No se ha podido completar la petición'
         });
     }
-}
+};
+
 
 export const changeDateTime = async (req, res) => {
     try {
@@ -61,46 +67,34 @@ export const changeDateTime = async (req, res) => {
                 msg: 'No existen modificaciones en el tiempo'
             });
         }
-    
-        try {
-            const foundedDate = await prisma.date.findUnique({
-                where: {
-                    id: dateId
-                }
-            });
-    
-            if (!foundedDate) {
-                return res.status(404).json({
-                    ok: false,
-                    msg: 'No se ha encontrado la fecha a modificar'
-                });
-            }
-    
-            const updatedDate = await prisma.date.update({
-                where: {
-                    id: dateId
-                },
-                data: {
-                    ...(newStartTime && { startTime: newStartTime }),
-                    ...(newEndTime && { endTime: newEndTime }),
-                }
-            });
-    
-            res.json({
-                ok: true,
-                msg: 'Fecha modificada con éxito',
-                updatedDate
-            });
-    
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({
+
+        const foundedDate = await prisma.date.findUnique({
+            where: { id: dateId }
+        });
+
+        if (!foundedDate) {
+            return res.status(404).json({
                 ok: false,
-                msg: 'Error al modificar la fecha'
+                msg: 'No se ha encontrado la fecha a modificar'
             });
         }
+
+        const updatedDate = await prisma.date.update({
+            where: { id: dateId },
+            data: {
+                ...(newStartTime && { startTime: new Date(newStartTime) }),
+                ...(newEndTime && { endTime: new Date(newEndTime) }),
+            }
+        });
+
+        res.json({
+            ok: true,
+            msg: 'Fecha modificada con éxito',
+            updatedDate
+        });
+
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             msg: 'No se ha podido completar la petición'

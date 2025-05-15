@@ -342,31 +342,49 @@ export const checkAppointmentAvailability = async (req, res) => {
 
 export const getReservedAppointments = async (req, res) => {
     try {
-        const { dateId, duration } = req.query;
+        const { dateId, sessionZones } = req.query;
 
-        if (!dateId || !duration) {
-            return res.status(400).json({ msg: "Faltan parámetros (dateId y duration son requeridos)" });
+        if (!dateId || !sessionZones) {
+            return res.status(400).json({ msg: "Faltan parámetros (dateId y sessionZones son requeridos)" });
         }
-        
+
+        const sessionLength = parseInt(sessionZones) * 5;
+
         const dateConfig = await prisma.date.findUnique({
             where: { id: dateId },
-            select: { date: true }
+            select: {
+                date: true,
+                startTime: true,
+                endTime: true
+            }
         });
 
-        if (!dateConfig) {
-            return res.status(404).json({ msg: "No se encontró la fecha" });
+
+        let startOfDay, endOfDay, openingMinutes, closingMinutes;
+
+        if (dateConfig) {
+            const baseDate = new Date(dateConfig.date);
+            startOfDay = new Date(baseDate.setHours(0, 0, 0, 0));
+            endOfDay = new Date(baseDate.setHours(23, 59, 59, 999));
+
+            openingMinutes = toMinutes(dateConfig.startTime);
+            closingMinutes = toMinutes(dateConfig.endTime);
+        } else {
+            // Día actual si no hay dateConfig
+            const today = new Date();
+            startOfDay = new Date(today.setHours(0, 0, 0, 0));
+            endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+            openingMinutes = 9 * 60;   // 9:00 AM
+            closingMinutes = 20 * 60;  // 8:00 PM
         }
 
-        const dateOnly = dateConfig.date.toISOString().split("T")[0];
-        const startOfDay = new Date(`${dateOnly}T00:00:00.000Z`);
-        const endOfDay = new Date(`${dateOnly}T23:59:59.999Z`);
-
-        
-        const appointments = await prisma.appointment.findMany({ 
+        // 3. Obtener citas dentro del día correspondiente
+        const appointments = await prisma.appointment.findMany({
             where: {
                 date: {
                     gte: startOfDay,
-                    lte: endOfDay,
+                    lte: endOfDay
                 },
                 status: {
                     in: ["pending", "paid"]
@@ -374,20 +392,39 @@ export const getReservedAppointments = async (req, res) => {
             },
             select: {
                 date: true,
-                sessionLength: true,
+                sessionLength: true
             }
         });
 
+
+        const occupied = new Set();
+
+        for (const app of appointments) {
+            let start = new Date(app.date);
+            let end = new Date(start.getTime() + (app.sessionLength || sessionLength) * 60000);
+
+            while (start < end) {
+                occupied.add(toMinutes(start));
+                start = new Date(start.getTime() + 5 * 60000);
+            }
+        }
+
         const reservedTimes = [];
 
-        for (const appointment of appointments) {
-            let startTime = new Date(appointment.date);
-            const sessionMinutes = appointment.sessionLength || parseInt(duration);
-            let endTime = new Date(startTime.getTime() + sessionMinutes * 60000);
+        for (let t = openingMinutes; t + sessionLength <= closingMinutes; t += 5) {
+            let conflict = false;
 
-            while (startTime < endTime) {
-                reservedTimes.push(toMinutes(startTime));
-                startTime = new Date(startTime.getTime() + 5 * 60000); 
+            for (let i = 0; i < sessionLength; i += 5) {
+                if (occupied.has(t + i)) {
+                    conflict = true;
+                    break;
+                }
+            }
+
+            if (conflict) {
+                for (let i = 0; i < sessionLength; i += 5) {
+                    reservedTimes.push(t + i);
+                }
             }
         }
 

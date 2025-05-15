@@ -44,6 +44,6 @@ model CalendarSettings {
 model Date {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   date String
-  starTime String
+  startTime String
   endTime String
 }
