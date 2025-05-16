@@ -105,28 +105,18 @@ export const changeDateTime = async (req, res) => {
 
 
 export const removeDate = async (req, res) => {
-    const { dateToRemove } = req.query;
+    const { dateId } = req.query;
 
     try {
-        if (!dateToRemove) {
+        if (!dateId) {
             return res.status(400).json({
                 ok: false,
-                msg: "Se requiere el parámetro 'date'"
-            });
-        }
-        const decodedDate = decodeURIComponent(dateToRemove);
-        const parsedDate = new Date(decodedDate);
-
-        if (isNaN(parsedDate.getTime())) {
-            return res.status(400).json({
-                ok: false,
-                msg: "Formato de fecha inválido."
+                msg: "Se requiere el parámetro 'dateId' "
             });
         }
 
-        // Buscar el calendario en la base de datos
         const date = await prisma.date.delete({
-            where: { date: dateToRemove.date }
+            where: { id: dateId }
         });
 
         if (!date) {
