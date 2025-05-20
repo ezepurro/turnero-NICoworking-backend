@@ -342,16 +342,16 @@ export const checkAppointmentAvailability = async (req, res) => {
 
 export const getReservedAppointments = async (req, res) => {
     try {
-        const { dateId, sessionZones } = req.query;
+        const { date, sessionZones } = req.query;
 
-        if (!dateId || !sessionZones) {
+        if (!date || !sessionZones) {
             return res.status(400).json({ msg: "Faltan parámetros (dateId y sessionZones son requeridos)" });
         }
 
         const sessionLength = parseInt(sessionZones) * 5;
 
-        const dateConfig = await prisma.date.findUnique({
-            where: { id: dateId },
+        const dateConfig = await prisma.date.find({
+            where: { date:date },
             select: {
                 date: true,
                 startTime: true,
@@ -363,9 +363,9 @@ export const getReservedAppointments = async (req, res) => {
         let startOfDay, endOfDay, openingMinutes, closingMinutes;
 
         if (dateConfig) {
-            const baseDate = new Date(dateConfig.date);
-            startOfDay = new Date(baseDate.setHours(0, 0, 0, 0));
-            endOfDay = new Date(baseDate.setHours(23, 59, 59, 999));
+            const baseDate = dateConfig.date;
+            startOfDay = baseDate.setHours(0, 0, 0, 0);
+            endOfDay = baseDate.setHours(23, 59, 59, 999);
 
             openingMinutes = toMinutes(dateConfig.startTime);
             closingMinutes = toMinutes(dateConfig.endTime);

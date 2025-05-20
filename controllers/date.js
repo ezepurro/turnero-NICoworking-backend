@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 
 export const getDates = async ( req, res = response ) => {
     try {
-        const dates = await prisma.date.findFirst()
+        const dates = await prisma.date.findMany()
+        console.log(dates)
         res.json({
             ok: true,
             dates
@@ -21,25 +22,25 @@ export const getDates = async ( req, res = response ) => {
 }
 
 export const addDate = async (req, res = response) => {
-    const { newDateAvailable } = req.body;
+    const { newDateAvailable, startTime, endTime } = req.body;
 
     try {
-        const existingDate = await prisma.date.findUnique({
-            where: { date: newDateAvailable.date },
-        });
+        // const existingDate = await prisma.date.find({
+        //     where: { date: newDateAvailable.date },
+        // });
 
-        if (existingDate) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'Esta fecha ya está habilitada'
-            });
-        }
+        // if (existingDate) {
+        //     return res.status(404).json({
+        //         ok: false,
+        //         msg: 'Esta fecha ya está habilitada'
+        //     });
+        // }
 
         const date = await prisma.date.create({
             data: {
-                date: new Date(newDateAvailable.date),
-                startTime: new Date(newDateAvailable.startTime),
-                endTime: new Date(newDateAvailable.endTime)
+                date: newDateAvailable,
+                startTime: startTime,
+                endTime: endTime
             }
         });
 
@@ -82,8 +83,8 @@ export const changeDateTime = async (req, res) => {
         const updatedDate = await prisma.date.update({
             where: { id: dateId },
             data: {
-                ...(newStartTime && { startTime: new Date(newStartTime) }),
-                ...(newEndTime && { endTime: new Date(newEndTime) }),
+                ...(newStartTime && { startTime: newStartTime }),
+                ...(newEndTime && { endTime: newEndTime}),
             }
         });
 
