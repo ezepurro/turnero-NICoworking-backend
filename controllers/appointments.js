@@ -1,5 +1,6 @@
 import { response } from "express";
-import { addMinutes } from 'date-fns'
+import { addMinutes } from 'date-fns';
+import { DateTime } from "luxon";
 import { PrismaClient } from "@prisma/client";
 import { findAvailableSlots, toMinutes } from "../helpers/appointmentHelpers.js";
 
@@ -328,7 +329,6 @@ export const checkAppointmentAvailability = async (req, res) => {
 
         
         if (existingAppointment) {
-            console.log(existingAppointment);
             return res.json({ available: false });
         }
 
@@ -344,22 +344,22 @@ export const checkAppointmentAvailability = async (req, res) => {
 export const getReservedAppointments = async (req, res) => {
     try {
         const { date, duration } = req.query;
-        console.log('llega la soli papi')
-        console.log(date,duration)
+        const baseDate = new Date(`${date}T03:00:00.000Z`);
+        const newDate = baseDate.toISOString()
+
         if (!date || !duration) {
-            console.log('ESTOY ACA FALTAN PARAMETROS VIRGO')
+            
             return res.status(400).json({ msg: "Faltan parámetros (date y duration son requeridos)" });
         }
         
         const sessionLength = parseInt(duration);
 
-        // Buscar configuración de la jornada para esa fecha
         const dateConfig = await prisma.date.findFirst({
-            where: { date },
+            where: { date: newDate },
             select: { date: true, startTime: true, endTime: true }
         });
 
-        // Usamos el día completo solo para buscar los turnos guardados
+
         const startOfDay = new Date(`${date}T00:00:00.000Z`);
         const endOfDay = new Date(`${date}T23:59:59.999Z`);
 
@@ -393,18 +393,19 @@ export const getReservedAppointments = async (req, res) => {
         }
 
         // Definir jornada laboral: de 9:00 a 20:00 por default
-        let openingMinutes = 9 * 60;
-        let closingMinutes = 20 * 60;
+        let openingMinutes = 12;
+        let closingMinutes = 20;
+        
 
         if (dateConfig && dateConfig.startTime && dateConfig.endTime) {
-            const toMinutes = (timeStr) => {
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                return hours * 60 + minutes;
-            };
-
-            openingMinutes = toMinutes(dateConfig.startTime);
-            closingMinutes = toMinutes(dateConfig.endTime);
-        }
+        const toMinutes = (isoString) => {
+            const dateObj = new Date(isoString);
+            return dateObj.getUTCHours() * 60 + dateObj.getUTCMinutes();
+        };
+        openingMinutes = toMinutes(dateConfig.startTime);
+        closingMinutes = toMinutes(dateConfig.endTime);
+    }
+        console.log(openingMinutes)
 
         // Calcular los bloques que NO pueden usarse porque están ocupados
         const reservedTimes = [];
@@ -426,7 +427,11 @@ export const getReservedAppointments = async (req, res) => {
             }
         }
 
-        return res.json({ reservedTimes });
+        return res.json({ 
+            reservedTimes,
+            startTime: dateConfig.startTime,
+            endTime: dateConfig.endTime
+        });
 
     } catch (error) {
         console.error("Error obteniendo horarios ocupados:", error);

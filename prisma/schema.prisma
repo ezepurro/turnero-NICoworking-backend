@@ -36,10 +36,7 @@ model Appointment {
 }
 
 
-model CalendarSettings {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  waxDays       DateTime[]
-}
+
 
 model Date {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId

@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 export const getDates = async ( req, res = response ) => {
     try {
         const dates = await prisma.date.findMany()
-        console.log(dates)
         res.json({
             ok: true,
             dates
@@ -23,7 +22,7 @@ export const getDates = async ( req, res = response ) => {
 
 export const addDate = async (req, res = response) => {
     const { newDateAvailable, startTime, endTime } = req.body;
-
+    console.log(startTime,endTime)
     try {
         // const existingDate = await prisma.date.find({
         //     where: { date: newDateAvailable.date },
