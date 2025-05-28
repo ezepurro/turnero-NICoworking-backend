@@ -30,9 +30,17 @@ model Appointment {
   type          String
   status        String
   createdAt     DateTime @default(now()) 
+  extraName     String?
+  extraContact  String?
+  extraData     String?
 }
 
-model CalendarSettings {
+
+
+
+model Date {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  waxDays       DateTime[]
+  date String
+  startTime String
+  endTime String
 }
