@@ -431,7 +431,6 @@ export const getReservedAppointments = async (req, res) => {
             }
         });
 
-        // Crear un set con todos los minutos ocupados
         const occupied = new Set();
 
         for (const appointment of appointments) {
@@ -444,7 +443,6 @@ export const getReservedAppointments = async (req, res) => {
             }
         }
 
-        // Definir jornada laboral: de 9:00 a 20:00 por default
         let openingMinutes = 12;
         let closingMinutes = 20;
         
@@ -457,9 +455,7 @@ export const getReservedAppointments = async (req, res) => {
         openingMinutes = toMinutes(dateConfig.startTime);
         closingMinutes = toMinutes(dateConfig.endTime);
     }
-        console.log(openingMinutes)
 
-        // Calcular los bloques que NO pueden usarse porque están ocupados
         const reservedTimes = [];
 
         for (let t = openingMinutes; t + sessionLength <= closingMinutes; t += 5) {

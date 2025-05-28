@@ -12,7 +12,6 @@ export const createPreference = async (req, res) => {
     try {
         const { price, schedule, zonesAmmount, appointmentId } = req.body;
         const title = (zonesAmmount === 'Full-Body') ? 'Reserva de turno - Full-Body' : `Reserva de turno - ${zonesAmmount} zonas`;
-        console.log("SuccessUrl: ", `${config.FRONTEND_BASE_URL}/appointments`)
         const body = {
             items: [{
                 title: title,
@@ -31,8 +30,6 @@ export const createPreference = async (req, res) => {
             external_reference: appointmentId
 
         };
-
-        console.log("Preference Body:", body);
         
         const preference = new Preference(client);
         const result = await preference.create({ body });
