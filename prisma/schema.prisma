@@ -35,15 +35,9 @@ model Appointment {
   extraData     String?
 }
 
-
-model CalendarSettings {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  waxDays       DateTime[]
-}
-
 model Date {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   date String
-  starTime String
+  startTime String
   endTime String
 }

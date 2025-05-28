@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import config from "./config.js";
 import appointmentRouter from './routes/appointments.js';
 import authRouter from './routes/auth.js';
-import settingsRouter from './routes/settings.js';
+import datesRouter from './routes/date.js';
 import mpRouter from './routes/mercadoPago.js';
 import whatsappRouter from './routes/whatsapp.js';
 
@@ -23,7 +23,7 @@ app.use(express.json());
 // Rutas
 app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentRouter);
-app.use('/api/settings', settingsRouter);
+app.use('/api/date', datesRouter);
 app.use('/api/mercadopago', mpRouter);
 app.use('/api/whatsapp', whatsappRouter);
 
