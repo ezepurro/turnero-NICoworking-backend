@@ -18,8 +18,10 @@ datesRouter.post('/',
 datesRouter.put('/', 
     [
         JSWValidator, isAdmin
-    ], changeDateTime
+    ], 
+    changeDateTime
 )
+
 datesRouter.delete('/', 
     [
         JSWValidator, isAdmin

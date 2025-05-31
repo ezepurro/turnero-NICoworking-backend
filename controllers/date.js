@@ -4,7 +4,7 @@ import config from "../config.js";
 
 const prisma = new PrismaClient();
 
-export const getDates = async ( req, res = response ) => {
+export const getDates = async (req, res = response) => {
     try {
         const dates = await prisma.date.findMany()
         res.json({
@@ -22,19 +22,7 @@ export const getDates = async ( req, res = response ) => {
 
 export const addDate = async (req, res = response) => {
     const { newDateAvailable, startTime, endTime } = req.body;
-    console.log(startTime,endTime)
     try {
-        // const existingDate = await prisma.date.find({
-        //     where: { date: newDateAvailable.date },
-        // });
-
-        // if (existingDate) {
-        //     return res.status(404).json({
-        //         ok: false,
-        //         msg: 'Esta fecha ya está habilitada'
-        //     });
-        // }
-
         const date = await prisma.date.create({
             data: {
                 date: newDateAvailable,
@@ -61,6 +49,7 @@ export const addDate = async (req, res = response) => {
 export const changeDateTime = async (req, res) => {
     try {
         const { dateId, newStartTime, newEndTime } = req.body;
+        console.log(dateId, newStartTime, newEndTime);
 
         if (!newStartTime && !newEndTime) {
             return res.json({
@@ -83,7 +72,7 @@ export const changeDateTime = async (req, res) => {
             where: { id: dateId },
             data: {
                 ...(newStartTime && { startTime: newStartTime }),
-                ...(newEndTime && { endTime: newEndTime}),
+                ...(newEndTime && { endTime: newEndTime }),
             }
         });
 

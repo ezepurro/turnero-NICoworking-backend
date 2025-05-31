@@ -68,7 +68,7 @@ export const getAppointmentsByService = async (req, res) => {
 };
 
 
-export const createAppointment = async ( req, res = response ) => {
+export const createAppointment = async (req, res = response) => {
     const { userId, date, time, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
         // Verifico que existe el usuario
@@ -106,21 +106,35 @@ export const createAppointment = async ( req, res = response ) => {
     }
 }
 
-export const getUserAppointments = async ( req, res = response ) => {
+export const getUserAppointments = async (req, res = response) => {
     const userId = req.params.id;
+
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
+
         if (!user) {
             return res.status(404).json({
                 ok: false,
                 msg: 'Usuario no encontrado',
             });
         }
-        const appointments = await prisma.appointment.findMany({ where: { clientId: userId } });
+
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                clientId: userId,
+                status: 'paid'
+            }
+        });
+
+        const filteredAppointments = appointments.filter(app => {
+            return !app.extraName && !app.extraContact && !app.extraData;
+        });
+
         res.json({
             ok: true,
-            appointments
+            appointments: filteredAppointments
         });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -128,9 +142,9 @@ export const getUserAppointments = async ( req, res = response ) => {
             msg: 'No se ha podido completar la petición'
         });
     }
-}
+};
 
-export const updateAppointment = async ( req, res = response ) => {
+export const updateAppointment = async (req, res = response) => {
     const id = req.params.id;
     const { userId, date, sessionLength, sessionZones, contact, type, status } = req.body;
     try {
@@ -178,7 +192,7 @@ export const updateAppointment = async ( req, res = response ) => {
     }
 }
 
-export const deleteAppointment = async ( req, res = response ) => {
+export const deleteAppointment = async (req, res = response) => {
     const id = req.params.id;
     try {
         // Verifico que existe la cita
@@ -209,12 +223,12 @@ export const deleteAppointment = async ( req, res = response ) => {
 // Trae solo las fechas futuras
 export const getWaxAppointments = async (req, res = response) => {
     try {
-        const currentDate = new Date(); 
+        const currentDate = new Date();
         const waxAppointments = await prisma.appointment.findMany({
             where: {
                 type: 'Depilación',
                 date: {
-                    gt: currentDate 
+                    gt: currentDate
                 }
             }
         });
@@ -235,10 +249,10 @@ export const getWaxAppointments = async (req, res = response) => {
 export const getAppointmentsPagination = async (req, res = response) => {
     try {
         // ?page=1&limit=10
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 10;  
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
-        const skip = (page - 1) * limit;  
+        const skip = (page - 1) * limit;
 
         const appointments = await prisma.appointment.findMany({
             skip,
@@ -266,10 +280,10 @@ export const getAppointmentsPagination = async (req, res = response) => {
 export const getAppointmentsNoPaidPagination = async (req, res = response) => {
     try {
         // ?page=1&limit=10
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 10;  
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
-        const skip = (page - 1) * limit;  
+        const skip = (page - 1) * limit;
 
         const appointments = await prisma.appointment.findMany({
             where: {
@@ -327,7 +341,7 @@ export const checkAppointmentAvailability = async (req, res) => {
             }
         });
 
-        
+
         if (existingAppointment) {
             return res.json({ available: false });
         }
@@ -400,10 +414,10 @@ export const getReservedAppointments = async (req, res) => {
         const newDate = baseDate.toISOString()
 
         if (!date || !duration) {
-            
+
             return res.status(400).json({ msg: "Faltan parámetros (date y duration son requeridos)" });
         }
-        
+
         const sessionLength = parseInt(duration);
 
         const dateConfig = await prisma.date.findFirst({
@@ -445,16 +459,16 @@ export const getReservedAppointments = async (req, res) => {
 
         let openingMinutes = 12;
         let closingMinutes = 20;
-        
+
 
         if (dateConfig && dateConfig.startTime && dateConfig.endTime) {
-        const toMinutes = (isoString) => {
-            const dateObj = new Date(isoString);
-            return dateObj.getUTCHours() * 60 + dateObj.getUTCMinutes();
-        };
-        openingMinutes = toMinutes(dateConfig.startTime);
-        closingMinutes = toMinutes(dateConfig.endTime);
-    }
+            const toMinutes = (isoString) => {
+                const dateObj = new Date(isoString);
+                return dateObj.getUTCHours() * 60 + dateObj.getUTCMinutes();
+            };
+            openingMinutes = toMinutes(dateConfig.startTime);
+            closingMinutes = toMinutes(dateConfig.endTime);
+        }
 
         const reservedTimes = [];
 
@@ -475,7 +489,7 @@ export const getReservedAppointments = async (req, res) => {
             }
         }
 
-        return res.json({ 
+        return res.json({
             reservedTimes,
             startTime: dateConfig.startTime,
             endTime: dateConfig.endTime

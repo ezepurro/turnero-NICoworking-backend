@@ -1,37 +1,34 @@
 import cron from "node-cron";
-import config from "../config.js";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Programa la tarea para ejecutarse cada día a las 12AM
+// Se ejecuta todos los días a las 00:00
 cron.schedule('0 0 * * *', async () => {
     try {
-        const calendarSettings = await prisma.calendarSettings.findUnique({
-            where: { id: config.CALENDARID },
-        });
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        if (!calendarSettings) {
-            console.log('No se encontró la configuración del calendario');
-            return;
+        const allDates = await prisma.date.findMany();
+
+        const expiredIds = allDates
+            .filter(({ date }) => {
+                const parsedDate = new Date(date);
+                parsedDate.setHours(0, 0, 0, 0);
+                return parsedDate < today;
+            })
+            .map(d => d.id);
+
+        if (expiredIds.length > 0) {
+            await prisma.date.deleteMany({
+                where: {
+                    id: { in: expiredIds }
+                }
+            });
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-    
-        const updatedWaxDays = calendarSettings.waxDays.filter(date => {
-            const waxDate = new Date(date);
-            waxDate.setHours(0, 0, 0, 0);
-            return waxDate >= today;
-        });
-
-        await prisma.calendarSettings.update({
-            where: { id: config.CALENDARID },
-            data: { waxDays: updatedWaxDays },
-        });
-
-        console.log('Fechas pasadas eliminadas con éxito');
+        console.log(`Fechas pasadas eliminadas con éxito. Total: ${expiredIds.length}`);
     } catch (error) {
-        console.error('Error al limpiar waxDays:', error);
+        console.error('Error al limpiar las fechas pasadas', error);
     }
 });
