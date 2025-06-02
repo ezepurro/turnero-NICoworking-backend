@@ -49,7 +49,6 @@ export const addDate = async (req, res = response) => {
 export const changeDateTime = async (req, res) => {
     try {
         const { dateId, newStartTime, newEndTime } = req.body;
-        console.log(dateId, newStartTime, newEndTime);
 
         if (!newStartTime && !newEndTime) {
             return res.json({
